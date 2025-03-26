@@ -7,13 +7,12 @@
 #include <string.h>
 #include "dotenv.h"
 
-void load_env(const char* filename) {
+void dotenv_load(const char* filename) {
     FILE* file = fopen(filename, "r");
     if (!file) {
         perror("Could not open .env file");
         return;
     }
-    printf("123123\n");
 
     char line[256];
     while (fgets(line, sizeof(line), file)) {
@@ -28,4 +27,14 @@ void load_env(const char* filename) {
         }
     }
     fclose(file);
+
+    // todo:: delete
+    const char *DB_HOST = getenv("DB_HOST");
+    const char *DB_USERNAME = getenv("DB_USERNAME");
+    const char *DB_PASSWORD = getenv("DB_PASSWORD");
+    const char *PERPLEXITY_API_KEY = getenv("PERPLEXITY_API_KEY");
+    printf("DB_HOST = %s\n", DB_HOST);
+    printf("DB_USERNAME = %s\n", DB_USERNAME);
+    printf("DB_PASSWORD = %s\n", DB_PASSWORD);
+    printf("PERPLEXITY_API_KEY = %s\n", PERPLEXITY_API_KEY);
 }
