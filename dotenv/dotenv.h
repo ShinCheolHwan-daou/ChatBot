@@ -5,5 +5,5 @@
 #ifndef ENV_H
 #define ENV_H
 
-void load_env(const char* filename);
+void dotenv_load(const char* filename);
 #endif //ENV_H

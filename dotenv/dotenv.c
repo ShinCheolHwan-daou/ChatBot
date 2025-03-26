@@ -7,7 +7,7 @@
 #include <string.h>
 #include "dotenv.h"
 
-void load_env(const char* filename) {
+void dotenv_load(const char* filename) {
     FILE* file = fopen(filename, "r");
     if (!file) {
         perror("Could not open .env file");
