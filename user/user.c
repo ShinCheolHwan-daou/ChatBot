@@ -5,7 +5,7 @@
 #include "user.h"
 
 char g_chatbot_name[20] = "???";
-User g_user_data;
+User* g_user_data = NULL;
 
 void user_print_ascii_art() {
     printf("OOOOO          OOOOO\n");
@@ -56,20 +56,22 @@ int user_login_page() {
     printf("======================================\n");
     printf("%s) ID를 입력해주세요!\n>> ", g_chatbot_name);
     scanf("%s", user_id);
-    // [TODO] g_user_data에 db에서 user_id에 해당하는 정보 받아오기
-    strcpy(g_user_data.user_id, user_id);
-    strcpy(g_user_data.name, "이재진");
-    strcpy(g_user_data.password, "1234");
+    // // [TODO] g_user_data에 db에서 user_id에 해당하는 정보 받아오기 - 해냄~~` 맞나 확인 부탁드립니다
+    // strcpy(g_user_data.user_id, user_id);
+    // strcpy(g_user_data.name, "이재진");
+    // strcpy(g_user_data.password, "1234");
+    g_user_data = db_getUser(user_id);
+
 
     int life = 3;
     while (life--) {
         printf("%s) 비밀번호를 입력해주세요!\n>> ", g_chatbot_name);
         scanf("%s", password);
-        if (strcmp(g_user_data.password, password) == 0) {
-            printf("%s) %s님, 로그인이 완료되었습니다!\n", g_chatbot_name, g_user_data.name);
+        if (strcmp(g_user_data->password, password) == 0) {
+            printf("%s) %s님, 로그인이 완료되었습니다!\n", g_chatbot_name, g_user_data->name);
             printf("%s) 앗 참, 제 이름은 뭐로 할까요?\n>> ", g_chatbot_name);
             scanf("%s", g_chatbot_name);
-            printf("%s) 감사합니다! 이제 DAOU 자산관리 시스셈 시작합니다!\n", g_chatbot_name);
+            printf("%s) 감사합니다! 이제 DAOU 자산관리 시스템 시작합니다!\n", g_chatbot_name);
             getchar();
             printf("%s) 아무 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
             getchar();

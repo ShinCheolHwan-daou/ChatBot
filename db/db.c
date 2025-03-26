@@ -4,6 +4,9 @@
 #include <oci.h>
 
 #include "db.h"
+#include "../user/user.h"
+#include "../asset/asset.h"
+
 
 char* username = "C##C_CHATBOT";
 char* password = "1234";
@@ -151,7 +154,7 @@ User* db_getUser(const char* user_id) {
         // => 해당 user_id가 없는 경우
         free(user);
         user = NULL;
-        printf("[db_getUser] No rows found for user_id=%s\n", user_id);
+        printf("등록된 id가 없습니다");
     }
     else if (status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO) {
         // => 에러
@@ -193,7 +196,7 @@ Asset* db_getUserAsset(const char* user_id)
     }
 
     // 2) Asset 배열 2개 할당
-    Asset *assets = (Asset*)calloc(2, sizeof(Asset));
+    Asset *assets = (Asset*)calloc(TOTAL_ASSET_NUM, sizeof(Asset)*TOTAL_ASSET_NUM);
     if (!assets) {
         fprintf(stderr, "[db_getUserAsset] 메모리 할당 실패\n");
         db_disconnect();
@@ -203,8 +206,8 @@ Asset* db_getUserAsset(const char* user_id)
     // 초기값 세팅:
     // - assets[0] = 현금, assets[1] = 주식
     // - 만약 DB에 없으면 amount=0, asset_id=0인 상태를 유지
-    assets[0].category = CASH;
-    assets[1].category = STOCK;
+    assets[IDX_CASH].category = CASH;
+    assets[IDX_STOCK].category = STOCK;
     // user_id도 미리 넣어둬도 되지만, DB에서 가져오면 덮어씌워짐
 
     // --------------------------
@@ -330,10 +333,10 @@ Asset* db_getUserAsset(const char* user_id)
 
     // 만약 하나도 없으면 stockArray == NULL
     if (stockArray) {
-        assets[1].data.stock.user_stock = stockArray;
+        assets[IDX_STOCK].data.stock.user_stock = stockArray;
         // 필요하면 assets[1].stock_count = stockCount; // 등등
     } else {
-        assets[1].data.stock.user_stock = NULL;
+        assets[IDX_STOCK].data.stock.user_stock = NULL;
         // count=0 => 주식 없음
     }
 

@@ -15,7 +15,7 @@ typedef enum {
     //, CRYPTO // 추후
 } Asset_Type;
 
-typedef struct {
+typedef struct User_Stock {
     int user_stock_id;
     int stock_id;
     char stock_name[CHAR_LEN];
@@ -30,7 +30,7 @@ typedef union {
 
 } Asset_Data;
 
-typedef struct {
+typedef struct Asset {
     int asset_id;
     char user_id[CHAR_LEN];
     double amount; // 자산 별 총액

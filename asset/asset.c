@@ -13,11 +13,12 @@ const char* asset_type_strings[] = {
 
 void asset_print_asset() {
     // [TODO] asset 데이터 정보들 db에서 받아오는 함수 넣기
-    Asset asset_data[2];
+    Asset* asset_data;
+    asset_data = db_getUserAsset(g_user_data->user_id);
 
-    printf("<<%s님의 자산 현황>>\n", g_user_data.name);
-    printf("[현금자산] 총 %.2f원\n", 1000000.0);
-    printf("[주식자산] 총 %.2f원\n", 790000.0);
+    printf("<<%s님의 자산 현황>>\n", g_user_data->name);
+    printf("[현금자산] 총 %.2f원\n", asset_data[IDX_CASH].amount);
+    printf("[주식자산] 총 %.2f원\n", asset_data[IDX_STOCK].amount);
 
     getchar();
     printf("%s) 아무 키를 눌러 계속 진행하세요...\n", g_chatbot_name);

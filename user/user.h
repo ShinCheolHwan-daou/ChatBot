@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "../asset/asset.h"
+#include "../db/db.h"
 
 #define CHAR_LEN        255
 
@@ -17,14 +18,14 @@
 #define LOGIN_SUCCESS   0
 #define LOGIN_FAILED    -1
 
-typedef struct {
+typedef struct User {
     char user_id[CHAR_LEN];
     char name[CHAR_LEN];
     char password[CHAR_LEN];
 } User;
 
 extern char g_chatbot_name[20];
-extern User g_user_data;
+extern User* g_user_data;
 
 void user_print_ascii_art();
 int user_login_page();
