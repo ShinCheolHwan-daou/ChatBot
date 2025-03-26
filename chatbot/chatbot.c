@@ -1,6 +1,9 @@
 //
 // Created by daou__jaejin on 2025-03-25.
 //
+#include "chatbot.h"
+#include "../user/user.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +11,6 @@
 #include <curl/curl.h>
 #include <cjson/cJSON.h>
 
-#include "chatbot.h"
 
 #define ROLE_LENGTH 10
 #define CONTENT_LENGTH 4096
@@ -65,7 +67,7 @@ size_t write_callback(void *ptr, size_t size, size_t nmemb, void *userdata) {
     return total_size;
 }
 
-char *create_message_json(const int message_length, const Message *messages) {
+char *create_messages_json(const int message_length, const Message *messages) {
     cJSON *messages_json = cJSON_CreateArray();
     for (int i = 0; i < message_length; i++) {
         cJSON *message_json = cJSON_CreateObject();
@@ -83,7 +85,7 @@ char *create_request_body(const int message_length, const Message *messages) {
     cJSON *json = cJSON_CreateObject();
     cJSON_AddStringToObject(json, "model", "sonar");
 
-    char *messages_str = create_message_json(message_length, messages);
+    char *messages_str = create_messages_json(message_length, messages);
     cJSON *messages_json = cJSON_Parse(messages_str);
 
     cJSON_AddItemToObject(json, "messages", messages_json);
@@ -175,14 +177,20 @@ Message chatbot_chat_completions(const Message *messages, int message_length) {
 
 
 void chatbot_chat() {
+    // 1.
+    if (g_user_data == NULL) {
+        perror("Need user data.\n");
+    } else {
+    }
+
 
     perplexity_api_key = getenv("PERPLEXITY_API_KEY");
 
-    printf("챗봇 시작!\n");
+    printf("%s님 반갑습니다!\n", g_user_data->name);
     printf("챗봇을 중단하려면 quit 또는 q를 입력하세요.\n");
 
     int message_length = 0;
-    Message *messages = malloc(sizeof(Message) * 1024);
+    Message *messages = malloc(sizeof(Message) * 128);
     Message system_messages[] = {
         {
             "system",
@@ -207,9 +215,14 @@ void chatbot_chat() {
 
     while (true) {
         Message question = {"user"};
+        fflush(stdin);
         printf("\n질문을 입력해주세요: ");
         if (fgets(question.content, sizeof(question.content), stdin) == NULL) {
             perror("Error reading input.\n");
+        }
+
+        if (strcmp(question.content, "") == 0 || strcmp(question.content, "\n") == 0) {
+            continue;
         }
 
         question.content[strcspn(question.content, "\n")] = 0;
@@ -224,23 +237,31 @@ void chatbot_chat() {
     }
 
     // 1. 제목 생성
-    Message title_request = {"user", "Please summarize our conversation so far as a title."};
+    Message title_request = {"user", "Please summarize our conversation so far as a title (maximum 20 length)."};
     add_message(messages, &message_length, title_request);
     Message title = chatbot_chat_completions(messages, message_length);
-    printf("title: %s\n", title.content);
     message_length--;
 
     // 2. 요약 생성
     Message summary_request = {"user", "Please summarize our conversation so far as a brief summary."};
     add_message(messages, &message_length, summary_request);
     Message summary = chatbot_chat_completions(messages, message_length);
-    printf("summary: %s\n", summary.content);
     message_length--;
 
     // todo:: 3. DB에 저장
-    char *message_str = create_message_json(message_length, messages);
+    char *messages_str = create_messages_json(message_length, messages);
+    Chat new_chat;
+    new_chat.user_id = g_user_data->user_id;
+    new_chat.title = title.content;
+    new_chat.summary = summary.content;
+    new_chat.content = messages_str;
 
+    printf("user_id: %s\n", new_chat.user_id);
+    printf("title: %s\n", new_chat.title);
+    printf("summary: %s\n", new_chat.summary);
+    printf("content: %s\n", new_chat.content);
 
+    free(messages_str);
     free(messages);
     printf("채팅을 종료합니다.\n");
 }

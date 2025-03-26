@@ -4,6 +4,8 @@
 
 #include "user.h"
 
+#include "../chatbot/chatbot.h"
+
 char g_chatbot_name[20] = "???";
 User* g_user_data = NULL;
 
@@ -110,10 +112,7 @@ int user_run_main_page() {
             getchar();
             break;
         case 4:
-            printf("아직 구현되지 않은 기능입니다.\n");
-            getchar();
-            printf("%s) 아무 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-            getchar();
+            chatbot_chat();
             break;
         case 5:
             printf("아직 구현되지 않은 기능입니다.\n");
