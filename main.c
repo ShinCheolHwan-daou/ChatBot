@@ -3,7 +3,6 @@
 
 #include "asset/asset.h"
 #include "chatbot/chatbot.h"
-#include "chatbot/curlTest.h"
 #include "db/db.h"
 #include "dotenv/dotenv.h"
 #include "file/file.h"

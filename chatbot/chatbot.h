@@ -5,4 +5,6 @@
 #ifndef CHATBOT_H
 #define CHATBOT_H
 
+void chatbot_chat();
+
 #endif //CHATBOT_H
