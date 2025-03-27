@@ -13,6 +13,7 @@ typedef struct User_Stock User_Stock;
 User* db_getUser(const char* user_id);
 Asset* db_getUserAsset(const char* user_id);
 User_Stock* db_getUserStockList(const char *user_id, int *outCount);
+User_Stock* db_getUserStock(const char *user_id, const char *stock_name);
 
 
 #endif // DB_H
