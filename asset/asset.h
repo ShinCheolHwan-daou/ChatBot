@@ -6,6 +6,8 @@
 #define ASSET_H
 
 #include "../user/user.h"
+#include <stdlib.h>
+#include <stdbool.h>
 
 #define CHAR_LEN 255
 
@@ -42,13 +44,17 @@ typedef struct Asset {
 
 // 1번 선택지
 void asset_print_asset();
+
 // 2번 선택지
 void asset_save_asset();
-// 3번 선택지
-void asset_modify_asset_amount();
-
 static void save_csv(Asset *asset);
 static void save_binary(Asset *asset);
 static void save_text(Asset *asset);
+
+// 3번 선택지
+void asset_modify_asset_amount();
+static void modify_cash();
+static void modify_stock();
+
 
 #endif //ASSET_H
