@@ -138,7 +138,6 @@ Message chatbot_chat_completions(const Message *messages, int message_length) {
         curl_easy_setopt(curl, CURLOPT_POST, 1L);
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_data);
 
-        // todo:: env에서 가져오기
         // 요청 헤더 설정 (JSON 데이터 전송)
         struct curl_slist *headers = NULL;
         headers = curl_slist_append(headers, "Content-Type: application/json");
@@ -174,12 +173,10 @@ Message chatbot_chat_completions(const Message *messages, int message_length) {
 
 
 void chatbot_chat() {
-    // 1.
+    fflush(stdin);
     if (g_user_data == NULL) {
         perror("Need user data.\n");
-    } else {
     }
-
 
     perplexity_api_key = getenv("PERPLEXITY_API_KEY");
 
@@ -240,7 +237,9 @@ void chatbot_chat() {
     message_length--;
 
     // 2. 요약 생성
-    Message summary_request = {"user", "Please summarize our conversation so far as a brief summary. (maximum 3 lines)"};
+    Message summary_request = {
+        "user", "Please summarize our conversation so far as a brief summary. (maximum 3 lines)"
+    };
     add_message(messages, &message_length, summary_request);
     Message summary = chatbot_chat_completions(messages, message_length);
     message_length--;
@@ -254,6 +253,10 @@ void chatbot_chat() {
 
     printf("title: %s\n", new_chat.title);
     printf("summary: %s\n", new_chat.summary);
+    printf("content: %s\n", new_chat.content);
+
+    // todo:: db에 저장
+    // db_insertUserChat(new_chat);
 
     free(messages_str);
     free(messages);
