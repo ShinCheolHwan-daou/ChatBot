@@ -568,3 +568,299 @@ User_Stock* db_getUserStock(const char *user_id, const char *stock_name) {
     return result;
 }
 
+int db_updateAsset(int asset_id, double delta) { // 성공하면 0 반환해요
+    if (asset_id <= 0) {
+        fprintf(stderr, "[db_addToAssetAmount] Invalid asset_id: %d\n", asset_id);
+        return -1;
+    }
+
+    if (db_connect() != 0) {
+        fprintf(stderr, "[db_addToAssetAmount] DB 연결 실패\n");
+        return -1;
+    }
+
+    double current_amount = 0.0;
+
+    // 1) 현재 amount 조회
+    const char *sql_select = "SELECT AMOUNT FROM ASSET WHERE ASSET_ID = :1";
+    OCIStmt *stmt_select = NULL;
+    OCIHandleAlloc(envhp, (dvoid**)&stmt_select, OCI_HTYPE_STMT, 0, NULL);
+    OCIStmtPrepare(stmt_select, errhp, (text*)sql_select, strlen(sql_select), OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+    OCIBind *bnd1 = NULL;
+    OCIDefine *def1 = NULL;
+
+    OCIBindByPos(stmt_select, &bnd1, errhp, 1, (dvoid*)&asset_id, sizeof(asset_id), SQLT_INT,
+                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt_select, &def1, errhp, 1, &current_amount, sizeof(current_amount), SQLT_BDOUBLE,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+
+    sword status = OCIStmtExecute(svchp, stmt_select, errhp, 1, 0, NULL, NULL, OCI_DEFAULT);
+    if (status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO) {
+        fprintf(stderr, "[db_addToAssetAmount] 현재 amount 조회 실패\n");
+        check_error(errhp);
+        OCIHandleFree(stmt_select, OCI_HTYPE_STMT);
+        db_disconnect();
+        return -1;
+    }
+    OCIHandleFree(stmt_select, OCI_HTYPE_STMT);
+
+    // 2) 더한 값 계산
+    double new_amount = current_amount + delta;
+
+    // 3) 업데이트
+    const char *sql_update = "UPDATE ASSET SET AMOUNT = :1 WHERE ASSET_ID = :2";
+    OCIStmt *stmt_update = NULL;
+    OCIHandleAlloc(envhp, (dvoid**)&stmt_update, OCI_HTYPE_STMT, 0, NULL);
+    OCIStmtPrepare(stmt_update, errhp, (text*)sql_update, strlen(sql_update), OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+    OCIBind *bnd_amt = NULL, *bnd_id = NULL;
+    OCIBindByPos(stmt_update, &bnd_amt, errhp, 1, &new_amount, sizeof(new_amount), SQLT_BDOUBLE,
+                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    OCIBindByPos(stmt_update, &bnd_id, errhp, 2, &asset_id, sizeof(asset_id), SQLT_INT,
+                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+    status = OCIStmtExecute(svchp, stmt_update, errhp, 1, 0, NULL, NULL, OCI_DEFAULT);
+    if (status != OCI_SUCCESS) {
+        fprintf(stderr, "[db_addToAssetAmount] amount 업데이트 실패\n");
+        check_error(errhp);
+        OCIHandleFree(stmt_update, OCI_HTYPE_STMT);
+        db_disconnect();
+        return -1;
+    }
+
+    // 4) 커밋
+    OCITransCommit(svchp, errhp, 0);
+    OCIHandleFree(stmt_update, OCI_HTYPE_STMT);
+
+    db_disconnect();
+    return 0;
+}
+
+int db_updateUserStock(const char* user_id, const char* stock_name, int d_quantity, double d_totalprice) {
+    if (!user_id || !stock_name || d_quantity <= 0 || d_totalprice < 0) {
+        fprintf(stderr, "[db_updateUserStock] Invalid parameters.\n");
+        return -1;
+    }
+
+    if (db_connect() != 0) {
+        fprintf(stderr, "[db_updateUserStock] DB 연결 실패\n");
+        return -1;
+    }
+
+    int user_stock_id = 0;
+    int prev_quantity = 0;
+    double prev_total = 0.0;
+
+    // 1. 보유 여부 확인
+    const char *sql_check =
+        "SELECT us.USER_STOCK_ID, us.QUANTITY, us.TOTAL_PRICE "
+        "FROM USER_STOCK us, STOCK s "
+        "WHERE us.USER_ID = :1 AND us.STOCK_ID = s.STOCK_ID AND s.NAME = :2";
+
+    OCIStmt *stmt_check = NULL;
+    OCIHandleAlloc(envhp, (dvoid**)&stmt_check, OCI_HTYPE_STMT, 0, NULL);
+    OCIStmtPrepare(stmt_check, errhp, (text*)sql_check, strlen(sql_check), OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+    OCIBind *bnd1 = NULL, *bnd2 = NULL;
+    OCIDefine *def1 = NULL, *def2 = NULL, *def3 = NULL;
+
+    OCIBindByPos(stmt_check, &bnd1, errhp, 1, (dvoid*)user_id, strlen(user_id)+1, SQLT_STR,
+                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    OCIBindByPos(stmt_check, &bnd2, errhp, 2, (dvoid*)stock_name, strlen(stock_name)+1, SQLT_STR,
+                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+    OCIDefineByPos(stmt_check, &def1, errhp, 1, &user_stock_id, sizeof(user_stock_id), SQLT_INT,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt_check, &def2, errhp, 2, &prev_quantity, sizeof(prev_quantity), SQLT_INT,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt_check, &def3, errhp, 3, &prev_total, sizeof(prev_total), SQLT_BDOUBLE,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+
+    sword status = OCIStmtExecute(svchp, stmt_check, errhp, 0, 0, NULL, NULL, OCI_DEFAULT); // row 수 0으로
+    if (status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO) {
+        fprintf(stderr, "[db_updateUserStock] SELECT 실행 실패\n");
+        check_error(errhp);
+        OCIHandleFree(stmt_check, OCI_HTYPE_STMT);
+        db_disconnect();
+        return -1;
+    }
+
+    // 🎯 반드시 FETCH를 수행해야 row 유무를 알 수 있어
+    status = OCIStmtFetch2(stmt_check, errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT);
+
+    if (status == OCI_NO_DATA) {
+        printf("[db_updateUserStock] 보유 주식 없음 → 신규 추가\n");
+        OCIHandleFree(stmt_check, OCI_HTYPE_STMT);
+        db_disconnect();
+        return db_insertUserStock(user_id, stock_name, d_quantity, d_totalprice);
+    }
+    else if (status == OCI_SUCCESS) {
+        // 2. 보유 중이면 UPDATE
+        int new_quantity = prev_quantity + d_quantity;
+        double new_total = prev_total + d_totalprice;
+
+        const char *sql_update =
+            "UPDATE USER_STOCK SET QUANTITY = :1, TOTAL_PRICE = :2 WHERE USER_STOCK_ID = :3";
+
+        OCIStmt *stmt_update = NULL;
+        OCIHandleAlloc(envhp, (dvoid**)&stmt_update, OCI_HTYPE_STMT, 0, NULL);
+        OCIStmtPrepare(stmt_update, errhp, (text*)sql_update, strlen(sql_update), OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+        OCIBind *bq = NULL, *bt = NULL, *bid = NULL;
+        OCIBindByPos(stmt_update, &bq, errhp, 1, &new_quantity, sizeof(new_quantity), SQLT_INT,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+        OCIBindByPos(stmt_update, &bt, errhp, 2, &new_total, sizeof(new_total), SQLT_BDOUBLE,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+        OCIBindByPos(stmt_update, &bid, errhp, 3, &user_stock_id, sizeof(user_stock_id), SQLT_INT,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+        status = OCIStmtExecute(svchp, stmt_update, errhp, 1, 0, NULL, NULL, OCI_DEFAULT);
+        if (status != OCI_SUCCESS) {
+            fprintf(stderr, "[db_updateUserStock] UPDATE 실패\n");
+            check_error(errhp);
+            OCIHandleFree(stmt_update, OCI_HTYPE_STMT);
+            db_disconnect();
+            return -1;
+        }
+
+        OCITransCommit(svchp, errhp, 0);
+        OCIHandleFree(stmt_update, OCI_HTYPE_STMT);
+
+    } else {
+        fprintf(stderr, "[db_updateUserStock] SELECT 에러\n");
+        check_error(errhp);
+        db_disconnect();
+        return -1;
+    }
+
+    db_disconnect();
+    return 0;
+}
+
+int db_insertUserStock(const char* user_id, const char* stock_name, int quantity, double total_price) {
+    printf("[db_insertUserStock] user_id=%s, stock_name=%s, quantity=%d, total_price=%.2f\n",user_id, stock_name, quantity, total_price);
+    if (!user_id || !stock_name || quantity <= 0 || total_price < 0) {
+        fprintf(stderr, "[db_insertUserStock] Invalid input\n");
+        return -1;
+    }
+
+    if (db_connect() != 0) {
+        fprintf(stderr, "[db_insertUserStock] DB 연결 실패\n");
+        return -1;
+    }
+
+    // 1. stock_name으로 STOCK_ID 조회
+    int stock_id = 0;
+    {
+        const char* sql_find_stock =
+            "SELECT STOCK_ID FROM STOCK WHERE NAME = :1";
+
+        OCIStmt *stmt = NULL;
+        OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
+        OCIStmtPrepare(stmt, errhp, (text*)sql_find_stock, strlen(sql_find_stock), OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+        OCIBind *bnd = NULL;
+        OCIDefine *def = NULL;
+
+        OCIBindByPos(stmt, &bnd, errhp, 1, (dvoid*)stock_name, strlen(stock_name)+1, SQLT_STR,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+        OCIDefineByPos(stmt, &def, errhp, 1, &stock_id, sizeof(stock_id), SQLT_INT,
+                       NULL, NULL, NULL, OCI_DEFAULT);
+
+        sword status = OCIStmtExecute(svchp, stmt, errhp, 1, 0, NULL, NULL, OCI_DEFAULT);
+        OCIHandleFree(stmt, OCI_HTYPE_STMT);
+
+        if (status != OCI_SUCCESS) {
+            fprintf(stderr, "[db_insertUserStock] STOCK_ID 조회 실패 (stock_name=%s)\n", stock_name);
+            check_error(errhp);
+            db_disconnect();
+            return -1;
+        }
+    }
+
+    // 2. INSERT INTO USER_STOCK
+    {
+        const char* sql_insert =
+            "INSERT INTO USER_STOCK (USER_ID, STOCK_ID, QUANTITY, TOTAL_PRICE) "
+            "VALUES (:1, :2, :3, :4)";
+
+        OCIStmt *stmt = NULL;
+        OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
+        OCIStmtPrepare(stmt, errhp, (text*)sql_insert, strlen(sql_insert), OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+        OCIBind *bnd1 = NULL, *bnd2 = NULL, *bnd3 = NULL, *bnd4 = NULL;
+
+        OCIBindByPos(stmt, &bnd1, errhp, 1, (dvoid*)user_id, strlen(user_id)+1, SQLT_STR,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+        OCIBindByPos(stmt, &bnd2, errhp, 2, &stock_id, sizeof(stock_id), SQLT_INT,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+        OCIBindByPos(stmt, &bnd3, errhp, 3, &quantity, sizeof(quantity), SQLT_INT,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+        OCIBindByPos(stmt, &bnd4, errhp, 4, &total_price, sizeof(total_price), SQLT_BDOUBLE,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+        sword status = OCIStmtExecute(svchp, stmt, errhp, 1, 0, NULL, NULL, OCI_DEFAULT);
+        if (status != OCI_SUCCESS) {
+            fprintf(stderr, "[db_insertUserStock] INSERT 실패\n");
+            check_error(errhp);
+            OCIHandleFree(stmt, OCI_HTYPE_STMT);
+            db_disconnect();
+            return -1;
+        }
+
+        OCITransCommit(svchp, errhp, 0);
+        OCIHandleFree(stmt, OCI_HTYPE_STMT);
+    }
+
+    db_disconnect();
+    return 0;
+}
+
+bool db_checkStockName(char *stock_name) {
+    if (!stock_name || strlen(stock_name) == 0) {
+        fprintf(stderr, "[db_checkStockName] Invalid stock_name\n");
+        return false;
+    }
+
+    if (db_connect() != 0) {
+        fprintf(stderr, "[db_checkStockName] DB 연결 실패\n");
+        return false;
+    }
+
+    const char *sql = "SELECT 1 FROM STOCK WHERE NAME = :1";
+
+    OCIStmt *stmt = NULL;
+    OCIBind *bnd1 = NULL;
+    OCIDefine *def1 = NULL;
+    int result = 0;
+
+    // Prepare
+    OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
+    OCIStmtPrepare(stmt, errhp, (text*)sql, strlen(sql), OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+    // Bind
+    OCIBindByPos(stmt, &bnd1, errhp, 1, (dvoid*)stock_name, strlen(stock_name)+1, SQLT_STR,
+                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+    // Define
+    OCIDefineByPos(stmt, &def1, errhp, 1, &result, sizeof(result), SQLT_INT,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+
+    // Execute
+    sword status = OCIStmtExecute(svchp, stmt, errhp, 0, 0, NULL, NULL, OCI_DEFAULT);
+
+    // Fetch
+    status = OCIStmtFetch2(stmt, errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT);
+
+    // Clean up
+    OCIHandleFree(stmt, OCI_HTYPE_STMT);
+    db_disconnect();
+
+    if (status == OCI_SUCCESS || status == OCI_SUCCESS_WITH_INFO) {
+        return true;  // 데이터 존재
+    } else {
+        return false; // 존재하지 않음 or 에러
+    }
+}
+
