@@ -8,6 +8,9 @@ link_directories(C:/oracle/instantclient_21_17)
 # curl 라이브러리 추가
 find_package(CURL REQUIRED)
 
+# cJSON 라이브러리 추가
+find_package(cJSON CONFIG REQUIRED)
+
 set(CMAKE_C_STANDARD 11)
 
 add_executable(ChatBot main.c
@@ -21,9 +24,7 @@ add_executable(ChatBot main.c
         user/user.h
         asset/asset.c
         asset/asset.h
-        chatbot/curlTest.c
-        chatbot/curlTest.h
         dotenv/dotenv.c
         dotenv/dotenv.h)
 
-target_link_libraries(ChatBot oci CURL::libcurl)
+target_link_libraries(ChatBot oci CURL::libcurl cjson)
