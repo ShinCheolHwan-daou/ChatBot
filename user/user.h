@@ -10,6 +10,7 @@
 #include "../asset/asset.h"
 #include "../db/db.h"
 
+
 #define CHAR_LEN        255
 
 #define MAIN_WORKING    0

@@ -23,11 +23,12 @@ void check_error(OCIError* errhp) {
     sb4 errcode = 0;
     OCIErrorGet((dvoid*)errhp, (ub4)1, (text*)NULL, &errcode, errbuf, (ub4)sizeof(errbuf),
         OCI_HTYPE_ERROR);
-    printf("Error: %p\n", errbuf);
+    // printf("Error: %p\n", errbuf);
 }
 
 
 static int db_connect() {
+    putenv("NLS_LANG=.AL32UTF8");
     // 환경 핸들 생성
     if (OCIEnvCreate(&envhp, OCI_DEFAULT, NULL, NULL, NULL, NULL, 0, NULL) !=
         OCI_SUCCESS) {
@@ -421,7 +422,7 @@ User_Stock* db_getUserStockList(const char *user_id, int *outCount)
     // (C) 주식 목록 SELECT (JOIN STOCK)
     // --------------------------------------------------
     const char *sql_user_stocks =
-        "SELECT us.USER_STOCK_ID, us.STOCK_ID, s.NAME, us.QUANTITY, us.TOTAL_PRICE "
+        "SELECT us.USER_STOCK_ID, us.STOCK_ID, s.NAME, us.QUANTITY, us.TOTAL_PRICE, s.PRICE"
         "FROM USER_STOCK us, STOCK s "
         "WHERE us.USER_ID = :1 AND us.STOCK_ID = s.STOCK_ID";
 
@@ -444,11 +445,12 @@ User_Stock* db_getUserStockList(const char *user_id, int *outCount)
     int    stock_id;
     char   stock_name[64];
     int    quantity;
-    int    total_price;
+    double    total_price;
+    double    current_price;
 
     memset(stock_name, 0, sizeof(stock_name));
 
-    OCIDefine *def1=NULL, *def2=NULL, *def3=NULL, *def4=NULL, *def5=NULL;
+    OCIDefine *def1=NULL, *def2=NULL, *def3=NULL, *def4=NULL, *def5=NULL, *def6=NULL;
     OCIDefineByPos(stmt, &def1, errhp, 1, &user_stock_id, sizeof(user_stock_id), SQLT_INT,
                    NULL, NULL, NULL, OCI_DEFAULT);
     OCIDefineByPos(stmt, &def2, errhp, 2, &stock_id,      sizeof(stock_id),      SQLT_INT,
@@ -457,7 +459,9 @@ User_Stock* db_getUserStockList(const char *user_id, int *outCount)
                    NULL, NULL, NULL, OCI_DEFAULT);
     OCIDefineByPos(stmt, &def4, errhp, 4, &quantity,      sizeof(quantity),       SQLT_INT,
                    NULL, NULL, NULL, OCI_DEFAULT);
-    OCIDefineByPos(stmt, &def5, errhp, 5, &total_price,   sizeof(total_price),    SQLT_INT,
+    OCIDefineByPos(stmt, &def5, errhp, 5, &total_price,   sizeof(total_price),    SQLT_BDOUBLE,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+OCIDefineByPos(stmt, &def6, errhp, 6, &current_price,   sizeof(current_price),    SQLT_BDOUBLE,
                    NULL, NULL, NULL, OCI_DEFAULT);
 
     // Fetch count번 반복
@@ -475,6 +479,7 @@ User_Stock* db_getUserStockList(const char *user_id, int *outCount)
                 sizeof(stockArray[idx].stock_name)-1);
         stockArray[idx].quantity      = quantity;
         stockArray[idx].total_price   = total_price;
+        stockArray[idx].current_price   = current_price;
 
         idx++;
     }
@@ -484,3 +489,82 @@ User_Stock* db_getUserStockList(const char *user_id, int *outCount)
     // 반환
     return stockArray;
 }
+
+User_Stock* db_getUserStock(const char *user_id, const char *stock_name) {
+    if (!user_id || !stock_name) return NULL;
+
+    if (db_connect() != 0) {
+        fprintf(stderr, "[db_getUserStock] DB 연결 실패\n");
+        return NULL;
+    }
+
+    const char *sql =
+        "SELECT us.USER_STOCK_ID, us.STOCK_ID, s.NAME, us.QUANTITY, us.TOTAL_PRICE, s.PRICE as CURRENT_PRICE "
+        "FROM STOCK s, USER_STOCK us "
+        "WHERE s.STOCK_ID = us.STOCK_ID "
+        "AND us.USER_ID = :1 "
+        "AND s.NAME = :2";
+
+    OCIStmt *stmt = NULL;
+    OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
+
+    OCIStmtPrepare(stmt, errhp, (text*)sql, (ub4)strlen(sql),
+                   OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+    // 바인딩
+    OCIBind *bnd1 = NULL, *bnd2 = NULL;
+    OCIBindByPos(stmt, &bnd1, errhp, 1, (dvoid*)user_id, (sb4)(strlen(user_id)+1),
+                 SQLT_STR, NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    OCIBindByPos(stmt, &bnd2, errhp, 2, (dvoid*)stock_name, (sb4)(strlen(stock_name)+1),
+                 SQLT_STR, NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+    OCIStmtExecute(svchp, stmt, errhp, 0, 0, NULL, NULL, OCI_DEFAULT);
+
+    // Define 변수
+    int user_stock_id = 0;
+    int stock_id = 0;
+    char db_stock_name[CHAR_LEN] = {0};
+    int quantity = 0;
+    double total_price = 0;
+    double current_price = 0;
+
+    OCIDefine *def1 = NULL, *def2 = NULL, *def3 = NULL, *def4 = NULL, *def5 = NULL, *def6 = NULL;
+    OCIDefineByPos(stmt, &def1, errhp, 1, &user_stock_id, sizeof(user_stock_id), SQLT_INT,
+               NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def2, errhp, 2, &stock_id, sizeof(stock_id), SQLT_INT,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def3, errhp, 3, db_stock_name, sizeof(db_stock_name), SQLT_STR,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def4, errhp, 4, &quantity, sizeof(quantity), SQLT_INT,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def5, errhp, 5, &total_price, sizeof(total_price), SQLT_BDOUBLE,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def6, errhp, 6, &current_price, sizeof(current_price), SQLT_BDOUBLE,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+
+    // Fetch
+    sword status = OCIStmtFetch2(stmt, errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT);
+
+    if (status == OCI_NO_DATA) {
+        printf("[db_getUserStock] No stock found for user_id='%s', stock_name='%s'\n", user_id, stock_name);
+    } else if (status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO) {
+        printf("[db_getUserStock] OCIStmtFetch2 failed.\n");
+        check_error(errhp);
+    }
+    User_Stock *result = NULL;
+    if (status == OCI_SUCCESS) {
+        result = (User_Stock*)malloc(sizeof(User_Stock));
+        result->user_stock_id = user_stock_id;
+        result->stock_id = stock_id;
+        strncpy(result->stock_name, db_stock_name, CHAR_LEN - 1);
+        result->quantity = quantity;
+        result->total_price = total_price;
+        result->current_price = current_price;
+    }
+
+    OCIHandleFree(stmt, OCI_HTYPE_STMT);
+    db_disconnect();
+
+    return result;
+}
+

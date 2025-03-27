@@ -6,6 +6,8 @@
 #define ASSET_H
 
 #include "../user/user.h"
+#include <stdlib.h>
+#include <stdbool.h>
 
 #define CHAR_LEN 255
 
@@ -20,7 +22,9 @@ typedef struct User_Stock {
     int stock_id;
     char stock_name[CHAR_LEN];
     int quantity;
-    int total_price; // 주식 별 총액
+    double total_price; // 주식 별 총액
+    double current_price; // 주식 현재가
+
 } User_Stock;
 
 typedef union {
@@ -40,13 +44,17 @@ typedef struct Asset {
 
 // 1번 선택지
 void asset_print_asset();
+
 // 2번 선택지
 void asset_save_asset();
-// 3번 선택지
-void asset_modify_asset_amount();
-
 static void save_csv(Asset *asset);
 static void save_binary(Asset *asset);
 static void save_text(Asset *asset);
+
+// 3번 선택지
+void asset_modify_asset_amount();
+static void modify_cash();
+static void modify_stock();
+
 
 #endif //ASSET_H
