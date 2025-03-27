@@ -568,3 +568,73 @@ User_Stock* db_getUserStock(const char *user_id, const char *stock_name) {
     return result;
 }
 
+double db_updateAsset(int asset_id, double delta) {
+    if (asset_id <= 0) {
+        fprintf(stderr, "[db_addToAssetAmount] Invalid asset_id: %d\n", asset_id);
+        return -1;
+    }
+
+    if (db_connect() != 0) {
+        fprintf(stderr, "[db_addToAssetAmount] DB 연결 실패\n");
+        return -1;
+    }
+
+    double current_amount = 0.0;
+
+    // 1) 현재 amount 조회
+    const char *sql_select = "SELECT AMOUNT FROM ASSET WHERE ASSET_ID = :1";
+    OCIStmt *stmt_select = NULL;
+    OCIHandleAlloc(envhp, (dvoid**)&stmt_select, OCI_HTYPE_STMT, 0, NULL);
+    OCIStmtPrepare(stmt_select, errhp, (text*)sql_select, strlen(sql_select), OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+    OCIBind *bnd1 = NULL;
+    OCIDefine *def1 = NULL;
+
+    OCIBindByPos(stmt_select, &bnd1, errhp, 1, (dvoid*)&asset_id, sizeof(asset_id), SQLT_INT,
+                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt_select, &def1, errhp, 1, &current_amount, sizeof(current_amount), SQLT_BDOUBLE,
+                   NULL, NULL, NULL, OCI_DEFAULT);
+
+    sword status = OCIStmtExecute(svchp, stmt_select, errhp, 1, 0, NULL, NULL, OCI_DEFAULT);
+    if (status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO) {
+        fprintf(stderr, "[db_addToAssetAmount] 현재 amount 조회 실패\n");
+        check_error(errhp);
+        OCIHandleFree(stmt_select, OCI_HTYPE_STMT);
+        db_disconnect();
+        return -1;
+    }
+    OCIHandleFree(stmt_select, OCI_HTYPE_STMT);
+
+    // 2) 더한 값 계산
+    double new_amount = current_amount + delta;
+
+    // 3) 업데이트
+    const char *sql_update = "UPDATE ASSET SET AMOUNT = :1 WHERE ASSET_ID = :2";
+    OCIStmt *stmt_update = NULL;
+    OCIHandleAlloc(envhp, (dvoid**)&stmt_update, OCI_HTYPE_STMT, 0, NULL);
+    OCIStmtPrepare(stmt_update, errhp, (text*)sql_update, strlen(sql_update), OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+    OCIBind *bnd_amt = NULL, *bnd_id = NULL;
+    OCIBindByPos(stmt_update, &bnd_amt, errhp, 1, &new_amount, sizeof(new_amount), SQLT_BDOUBLE,
+                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    OCIBindByPos(stmt_update, &bnd_id, errhp, 2, &asset_id, sizeof(asset_id), SQLT_INT,
+                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+    status = OCIStmtExecute(svchp, stmt_update, errhp, 1, 0, NULL, NULL, OCI_DEFAULT);
+    if (status != OCI_SUCCESS) {
+        fprintf(stderr, "[db_addToAssetAmount] amount 업데이트 실패\n");
+        check_error(errhp);
+        OCIHandleFree(stmt_update, OCI_HTYPE_STMT);
+        db_disconnect();
+        return -1;
+    }
+
+    // 4) 커밋
+    OCITransCommit(svchp, errhp, 0);
+    OCIHandleFree(stmt_update, OCI_HTYPE_STMT);
+
+    db_disconnect();
+    return 0;
+}
+
+
