@@ -1,6 +1,3 @@
-//
-// Created by daou__jaejin on 2025-03-25.
-//
 #include "chatbot.h"
 #include "../user/user.h"
 
@@ -243,12 +240,11 @@ void chatbot_chat() {
     message_length--;
 
     // 2. 요약 생성
-    Message summary_request = {"user", "Please summarize our conversation so far as a brief summary."};
+    Message summary_request = {"user", "Please summarize our conversation so far as a brief summary. (maximum 3 lines)"};
     add_message(messages, &message_length, summary_request);
     Message summary = chatbot_chat_completions(messages, message_length);
     message_length--;
 
-    // todo:: 3. DB에 저장
     char *messages_str = create_messages_json(message_length, messages);
     Chat new_chat;
     new_chat.user_id = g_user_data->user_id;
@@ -256,10 +252,8 @@ void chatbot_chat() {
     new_chat.summary = summary.content;
     new_chat.content = messages_str;
 
-    printf("user_id: %s\n", new_chat.user_id);
     printf("title: %s\n", new_chat.title);
     printf("summary: %s\n", new_chat.summary);
-    printf("content: %s\n", new_chat.content);
 
     free(messages_str);
     free(messages);

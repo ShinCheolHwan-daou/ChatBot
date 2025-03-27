@@ -1,8 +1,6 @@
-//
-// Created by daou__jaejin on 2025-03-25.
-//
-
 #ifndef FILE_H
 #define FILE_H
+
+void file_export_json();
 
 #endif //FILE_H
