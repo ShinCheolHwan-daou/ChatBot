@@ -53,15 +53,19 @@ int user_login_page() {
     user_print_ascii_art();
     printf("\n======================================\n");
     printf("DAOU 자산관리 시스템에 오신 것을 환영합니다.\n");
-    printf("======================================\n");
-    printf("%s) ID를 입력해주세요!\n>> ", g_chatbot_name);
-    scanf("%s", user_id);
-    // // [TODO] g_user_data에 db에서 user_id에 해당하는 정보 받아오기 - 해냄~~` 맞나 확인 부탁드립니다
-    // strcpy(g_user_data.user_id, user_id);
-    // strcpy(g_user_data.name, "이재진");
-    // strcpy(g_user_data.password, "1234");
-    g_user_data = db_getUser(user_id);
+    printf("========================================\n");
 
+    printf("%s) ID를 입력해주세요!\n>> ", g_chatbot_name);
+    while (1) {
+        scanf("%s", user_id);
+        g_user_data = db_getUser(user_id);
+        if (g_user_data == NULL) {
+            printf("%s) ID와 일치하는 회원 정보가 없습니다.\n", g_chatbot_name);
+            printf("%s) ID를 다시 입력해주세요!\n>> ", g_chatbot_name);
+        } else {
+            break;
+        }
+    }
 
     int life = 3;
     while (life--) {
@@ -73,7 +77,7 @@ int user_login_page() {
             scanf("%s", g_chatbot_name);
             printf("%s) 감사합니다! 이제 DAOU 자산관리 시스템 시작합니다!\n", g_chatbot_name);
             getchar();
-            printf("%s) 아무 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+            printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
             getchar();
             return LOGIN_SUCCESS;
         } else {
@@ -104,21 +108,18 @@ int user_run_main_page() {
             asset_save_asset();
             break;
         case 3:
-            printf("아직 구현되지 않은 기능입니다.\n");
-            getchar();
-            printf("%s) 아무 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-            getchar();
+            asset_modify_asset_amount();
             break;
         case 4:
             printf("아직 구현되지 않은 기능입니다.\n");
             getchar();
-            printf("%s) 아무 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+            printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
             getchar();
             break;
         case 5:
             printf("아직 구현되지 않은 기능입니다.\n");
             getchar();
-            printf("%s) 아무 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+            printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
             getchar();
             break;
         case 6:
@@ -126,7 +127,7 @@ int user_run_main_page() {
         default:
             printf("%s) 유효하지 않은 선택지입니다.\n", g_chatbot_name);
             getchar();
-            printf("%s) 아무 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+            printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
             getchar();
     }
     return MAIN_WORKING;
