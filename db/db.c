@@ -23,7 +23,7 @@ void check_error(OCIError* errhp) {
     sb4 errcode = 0;
     OCIErrorGet((dvoid*)errhp, (ub4)1, (text*)NULL, &errcode, errbuf, (ub4)sizeof(errbuf),
         OCI_HTYPE_ERROR);
-    // printf("Error: %p\n", errbuf);
+    printf("Error: %p\n", errbuf);
 }
 
 
@@ -105,25 +105,34 @@ User* db_getUser(const char* user_id) {
       "FROM \"USER\" "
       "WHERE USER_ID = :1";
 
-    // 3) 스테이트먼트 핸들
-    OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
-    check_error(errhp);
+    // 3) 스테이트먼트 핸들 할당
+    status = OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
+    if (status != OCI_SUCCESS) {
+        check_error(errhp);
+    }
 
     // 4) 쿼리 준비
-    OCIStmtPrepare(stmt, errhp, (text*)sql, (ub4)strlen(sql),
-                   OCI_NTV_SYNTAX, OCI_DEFAULT);
-    check_error(errhp);
+    status = OCIStmtPrepare(stmt, errhp, (text*)sql, (ub4)strlen(sql),
+                            OCI_NTV_SYNTAX, OCI_DEFAULT);
+    if (status != OCI_SUCCESS) {
+        check_error(errhp);
+    }
 
     // 5) 바인딩
     OCIBind* bnd1 = NULL;
-    OCIBindByPos(stmt, &bnd1, errhp, 1,
-                 (dvoid *)user_id, (sb4)(strlen(user_id)+1),
-                 SQLT_STR,
-                 NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    status = OCIBindByPos(stmt, &bnd1, errhp, 1,
+                          (dvoid *)user_id, (sb4)(strlen(user_id)+1),
+                          SQLT_STR,
+                          NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    if (status != OCI_SUCCESS) {
+        check_error(errhp);
+    }
 
     // 6) 실행
     status = OCIStmtExecute(svchp, stmt, errhp, 0, 0, NULL, NULL, OCI_DEFAULT);
-    check_error(errhp);
+    if (status != OCI_SUCCESS) {
+        check_error(errhp);
+    }
 
     // 7) Define
     User* user = (User*)malloc(sizeof(User));
