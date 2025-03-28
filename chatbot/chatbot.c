@@ -230,7 +230,7 @@ void chatbot_chat() {
         add_message(messages, &message_length, question);
         Message answer = chatbot_chat_completions(messages, message_length);
         add_message(messages, &message_length, answer);
-        printf("%s\n", answer.content);
+        printf("\n%s\n", answer.content);
     }
 
     // 질문을 안했을 경우, return
