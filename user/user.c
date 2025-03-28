@@ -13,42 +13,18 @@ char g_chatbot_name[20] = "???";
 User* g_user_data = NULL;
 
 void user_print_ascii_art() {
-    printf("OOOOO          OOOOO\n");
-    printf("                       OO   OOO      OOO   OO\n");
-    printf("                       OO     OOO  OOO     OO\n");
-    printf("                        OOO     OOOO     OOO\n");
-    printf("      OOOOOO          OO  OOOOOO    OOOOOO  OO          OOOOOO\n");
-    printf("   OOOO    OOOOO   OOOO                      OOOO   OOOOO    OOOO\n");
-    printf("               OOOOO     VVVVVV      VVVVVV     OOOOO\n");
-    printf("                       VVVVVVVVVV  VVVVVVVVVV\n");
-    printf("                     VVVVVVVVVVVVVVVVVVVVVVVVVV\n");
-    printf("                     VVVVVVVVVVVVVVVVVVVVVVVVVV\n");
-    printf("        XXXXXX       VVVVVVVVVVVVVVVVVVVVVVVVVV      XXXXXXX\n");
-    printf("     XXXXXXXXXXX      VVVVVVVVVVVVVVVVVVVVVVVV      XXXXXXXXXXX\n");
-    printf("    XXXXXXXXXXXXX      VVVVVVVVVVVVVVVVVVVVVV      XXXXXXXXXXXXX\n");
-    printf("   XXXXXXXXXXXXXXXX     VVVVVVVVVVVVVVVVVVVV     XXXXXXXXXXXXXXXX\n");
-    printf("   XXXXXXXXXXXXXXXX      VVVVVVVVVVVVVVVVVV      XXXXXXXXXXXXXXXX\n");
-    printf("   XXXXXXXXXXXXXXXX     XXVVVVVVVVVVVVVVVVXX     XXXXXXXXXXXXXXXX\n");
-    printf("    XXXXXXXXXXXXXXXX    XXXVVVVVVVVVVVVVVXXX    XXXXXXXXXXXXXXXX\n");
-    printf("       XXXXXXXXXXX     XXXX VVVVVVVVVVVV XXXX     XXXXXXXXXXX\n");
-    printf("           XXXXXXX    XXXX   VVVVVVVVVV   XXXX    XXXXXXX\n");
-    printf("    XXXXXX  XXXXXXXXXXXXXX    VVVVVVVV    XXXXXXXXXXXXXX  XXXXXX\n");
-    printf("  XXXXXXXXXXXXXXXXXXXXXX       VVVVVV       XXXXXXXXXXXXXXXXXXXXXX\n");
-    printf(" XXXXXXXXXXXXXXXXXXXX           VVVV           XXXXXXXXXXXXXXXXXXXX\n");
-    printf("XX XXXXX XXXXXXXXXXXX            VV            XXXXXXXXXXXX XXXXX XX\n");
-    printf("X  X XX  XXXXXXXXXXXX                          XXXXXXXXXXXX  XX X  X\n");
-    printf("     X  XXXXXXXXXXXX                            XXXXXXXXXXXX  X\n");
-    printf("       XXXXXXXXXXXXX                            XXXXXXXXXXXXX\n");
-    printf("       XXXXXXXXXXXXXX                          XXXXXXXXXXXXXX\n");
-    printf("       XXXXXXXXXXXXXXX                        XXXXXXXXXXXXXXX\n");
-    printf("        XXXXXXXXXXXXXXX                      XXXXXXXXXXXXXXX\n");
-    printf("       XXXXXXX  XXXXXXXX                    XXXXXXXX  XXXXXXX\n");
-    printf("      XXXXXXX     XXXXXXX                  XXXXXXX     XXXXXXX\n");
-    printf(" XXXXXXXXXXX        XXXXXX                XXXXXX        XXXXXXXXXXX\n");
-    printf(" XXXXXXXXX           XXXXX                XXXXX           XXXXXXXXX\n");
-    printf(" XXXX                 XXXXX              XXXXX                 XXXX\n");
-    printf("  XXX                  XXXXX            XXXXX                  XXX\n");
-    printf("                        XXXX            XXXX\n");
+    printf("     ／＞　 フ    $\n");
+    printf("    | 　_　_|      $$\n");
+    printf("  ／` ミ＿xノ      $\n");
+    printf(" /　 づ $$ ⊃          \n");
+    printf("/　  ｜　  ﾉ        \n");
+    printf("│　  ｜｜｜           ___________________________\n");
+    printf("／￣|　 ｜｜｜        |####=================####|\n");
+    printf("(￣ヽ＿_ヽ_)__)      |#(4)****DAOU FITS****(4)#|\n");
+    printf("＼二)                |*# {G}   < ^_^ >      #*|\n");
+    printf("                    |##=====ONE DOLLAR======##|\n");
+    printf("                    ---------------------------\n");
+
 }
 
 int user_login_page() {
