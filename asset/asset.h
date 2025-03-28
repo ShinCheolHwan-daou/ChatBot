@@ -30,6 +30,7 @@ typedef struct User_Stock {
 typedef union {
     struct {
         User_Stock *user_stock;
+        int stock_count;
     } stock;
 
 } Asset_Data;
@@ -56,5 +57,7 @@ void asset_modify_asset_amount();
 static void modify_cash();
 static void modify_stock();
 
+// Asset 구조체 할당 해제하는 함수
+void free_asset(Asset *asset);
 
 #endif //ASSET_H

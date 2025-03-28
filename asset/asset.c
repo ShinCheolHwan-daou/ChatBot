@@ -13,12 +13,24 @@ const char *asset_type_strings[] = {
 
 void asset_print_asset() {
     Asset *asset_data = db_getUserAsset(g_user_data->user_id);
-
     printf("<<%s님의 자산 현황>>\n", g_user_data->name);
     printf("[현금자산] 총 %.2f원\n", asset_data[IDX_CASH].amount);
     printf("[주식자산] 총 %.2f원\n", asset_data[IDX_STOCK].amount);
 
-    free(asset_data);
+    User_Stock *stock_data = asset_data[IDX_STOCK].data.stock.user_stock;
+    printf("총 데이터: %d\n", asset_data[IDX_STOCK].data.stock.stock_count);
+    if (stock_data != NULL) {
+        printf("데이터 있음\n");
+        for (int i = 0; i < asset_data[IDX_STOCK].data.stock.stock_count; i++) {
+            printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
+                stock_data[i].stock_name,
+                stock_data[i].quantity,
+                stock_data[i].current_price / stock_data[i].quantity,
+                stock_data[i].total_price);
+        }
+    }
+
+    free_asset(asset_data);
     getchar();
     printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
     getchar();
@@ -45,7 +57,7 @@ void asset_save_asset() {
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
     }
 
-    free(asset_data);
+    free_asset(asset_data);
     getchar();
     printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
     getchar();
@@ -84,6 +96,17 @@ static void save_text(Asset *asset) {
                 asset_type_strings[i],
                 asset[i].amount
         );
+    }
+
+    User_Stock *stock_data = asset[IDX_STOCK].data.stock.user_stock;
+    if (stock_data != NULL) {
+        for (int i = 0; i < asset[IDX_STOCK].data.stock.stock_count; i++) {
+            printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
+                stock_data[i].stock_name,
+                stock_data[i].quantity,
+                stock_data[i].current_price / stock_data[i].quantity,
+                stock_data[i].total_price);
+        }
     }
     fclose(f);
     printf("%s) text 파일 저장을 완료했습니다!\n", g_chatbot_name);
@@ -126,23 +149,25 @@ static void modify_cash() {
             break;
         case 2:
             asset_method = -1;
-            printf("%s) 출금할 금액을 알려주세요!\n>>", g_chatbot_name);
-            scanf("%lf", &amount);
             Asset *asset_data = db_getUserAsset(g_user_data->user_id);
+            printf("%s) 출금할 금액을 알려주세요! (현재 잔액: %.2f원)\n>>", g_chatbot_name, asset_data[IDX_CASH].amount);
+            scanf("%lf", &amount);
             if (asset_data[IDX_CASH].amount < amount) {
                 printf("%s) 출금할 금액이 잔액보다 많아요!\n", g_chatbot_name);
                 printf("%s) 남은 현금 잔액: %.2f원\n", g_chatbot_name, asset_data[IDX_CASH].amount);
-                free(asset_data);
+                free_asset(asset_data);
                 return;
             }
-            free(asset_data);
+            free_asset(asset_data);
             break;
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
             return;
     }
-    // [TODO] 현금자산 DB에 동기화하는 함수 호출
-    // db_updateAsset(g_user_data->user_id, IDX_CASH, amount * asset_method);
+    Asset *asset_data = db_getUserAsset(g_user_data->user_id);
+    int cash_id = asset_data[IDX_CASH].asset_id;
+    free_asset(asset_data);
+    db_updateAsset(cash_id, amount * asset_method);
     printf("%s) 현금자산 조정이 완료되었습니다!\n", g_chatbot_name);
 }
 
@@ -160,12 +185,11 @@ static void modify_stock() {
             asset_method = 1;
             printf("%s) 매수할 종목의 이름을 알려주세요!\n>>", g_chatbot_name);
             scanf("%s", stock_name);
-        // [TODO] 해당 종목의 이름을 가진 정보가 STOCK 테이블에 있는지 확인
-            // if (db_check_stock_name(stock_name) == false) {
-            //     printf("%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
-            //            g_chatbot_name, stock_name);
-            //     return;
-            // }
+            if (db_checkStockName(stock_name) == false) {
+                printf("%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
+                       g_chatbot_name, stock_name);
+                return;
+            }
             printf("%s) 매수할 종목의 개수를 알려주세요!\n>>", g_chatbot_name);
             scanf("%d", &quantity);
             printf("%s) 매수할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
@@ -175,18 +199,18 @@ static void modify_stock() {
             asset_method = -1;
             printf("%s) 매도할 종목의 이름을 알려주세요!\n>>", g_chatbot_name);
             scanf("%s", stock_name);
-        // [TODO] 해당 종목의 이름을 가진 정보가 STOCK 테이블에 있는지 확인
-            // if (db_check_stock_name(stock_name) == false) {
-            //     printf("%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
-            //            g_chatbot_name, stock_name);
-            //     return;
-            // }
-            printf("%s) 매도할 종목의 개수를 알려주세요!\n>>", g_chatbot_name);
+            if (db_checkStockName(stock_name) == false) {
+                printf("%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
+                       g_chatbot_name, stock_name);
+                return;
+            }
+            User_Stock *asset_data = db_getUserStock(g_user_data->user_id, stock_name);
+            printf("%s) 매도할 종목의 개수를 알려주세요! (현재 보유수: %d개)\n>>",
+                g_chatbot_name,
+                asset_data == NULL ? 0 : asset_data[IDX_STOCK].quantity);
             scanf("%d", &quantity);
             printf("%s) 매도할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
             scanf("%lf", &price);
-        // [TODO] 해당 종목의 User_Stock 정보 db에서 받아오기
-            User_Stock *asset_data = NULL; // = db_getUserStock(g_user_data->name, stock_name);
             if (asset_data == NULL || asset_data[IDX_STOCK].quantity < quantity) {
                 printf("%s) 매도할 보유주식이 적어요!\n", g_chatbot_name);
                 printf("%s) 현재 %s 보유주식: %d개\n",
@@ -202,9 +226,15 @@ static void modify_stock() {
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
             return;
     }
-    // [TODO] ASSET 테이블 주식자산 DB에 동기화하는 함수 호출
-    // db_updateAsset(g_user_data->user_id, IDX_STOCK, price * quantity * asset_method);
-    // [TODO] USER_STOCK 테이블 해당 종목 보유정보 DB에 동기화하는 함수 호출
-    // db_updateUserStock(g_user_data->user_id, stock_name, quantity, price);
+    Asset *asset_data = db_getUserAsset(g_user_data->user_id);
+    int stock_id = asset_data[IDX_STOCK].asset_id;
+    free_asset(asset_data);
+    db_updateAsset(stock_id, price * quantity * asset_method);
+    db_updateUserStock(g_user_data->user_id, stock_name, asset_method * quantity, asset_method * price);
     printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+}
+
+void free_asset(Asset *asset) {
+    free(asset[IDX_STOCK].data.stock.user_stock);
+    free(asset);
 }
