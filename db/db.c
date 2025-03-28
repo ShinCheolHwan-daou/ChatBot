@@ -74,7 +74,7 @@ static int db_connect() {
         check_error(errhp);
         return -1;
     }
-    printf("Oracle Database connected successfully.\n");
+    // printf("Oracle Database connected successfully.\n");
     return 0;
 }
 
@@ -324,6 +324,8 @@ Asset* db_getUserAsset(const char* user_id)
 
         OCIHandleFree(stmt, OCI_HTYPE_STMT);
     }
+    db_disconnect();
+
 
     // --------------------------
     // (C) 보유 주식 목록 조회
@@ -342,27 +344,24 @@ Asset* db_getUserAsset(const char* user_id)
     }
 
     // 3) DB 해제
-    db_disconnect();
+    // db_disconnect();
 
     // 4) 2개짜리 Asset 배열 리턴
     return assets;
 }
 
-/**
- * @brief   특정 user_id의 주식 보유 목록(User_Stock)을 고정 크기 배열로 가져온다
- * @param   user_id   사용자 아이디 (ex: "daou")
- * @param   outCount  주식 개수를 반환할 포인터 (반드시 유효한 int*를 넣어야 함)
- * @return  User_Stock*  동적 할당된 배열 (outCount개의 원소). 실패 시 NULL
- *
- * 주의: 이 함수 안에서 db_connect/db_disconnect는 호출하지 않습니다.
- *       이미 상위에서 연결이 열려 있다는 전제 하에, 스테이트먼트 준비/실행만 수행.
- */
+
 User_Stock* db_getUserStockList(const char *user_id, int *outCount)
 {
     if (!user_id || !outCount) {
         return NULL;
     }
     *outCount = 0;  // 초기화
+
+    if (db_connect() != 0) {
+        fprintf(stderr, "[db_getUserStock] DB 연결 실패\n");
+        return NULL;
+    }
 
     // --------------------------------------------------
     // (A) 먼저 보유 주식 수(count) 파악
@@ -486,8 +485,10 @@ OCIDefineByPos(stmt, &def6, errhp, 6, &current_price,   sizeof(current_price),  
 
     OCIHandleFree(stmt, OCI_HTYPE_STMT);
 
+    db_disconnect();
     // 반환
     return stockArray;
+
 }
 
 User_Stock* db_getUserStock(const char *user_id, const char *stock_name) {
@@ -863,4 +864,3 @@ bool db_checkStockName(char *stock_name) {
         return false; // 존재하지 않음 or 에러
     }
 }
-
