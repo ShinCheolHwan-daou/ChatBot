@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "../asset/asset.h"
-#include "../db/db.h"
 
 
 #define CHAR_LEN        255

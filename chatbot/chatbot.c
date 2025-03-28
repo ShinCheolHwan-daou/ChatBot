@@ -1,5 +1,6 @@
 #include "chatbot.h"
 #include "../user/user.h"
+#include "../db/db.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -263,7 +264,7 @@ void chatbot_chat() {
     printf("요약: %s\n", new_chat.summary);
 
     // todo::
-    // db_insertUserChat(new_chat);
+    db_insertUserChat(new_chat);
 
     free(messages_str);
     free(messages);

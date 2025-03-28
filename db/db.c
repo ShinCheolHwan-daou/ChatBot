@@ -23,7 +23,7 @@ void check_error(OCIError* errhp) {
     sb4 errcode = 0;
     OCIErrorGet((dvoid*)errhp, (ub4)1, (text*)NULL, &errcode, errbuf, (ub4)sizeof(errbuf),
         OCI_HTYPE_ERROR);
-    // printf("Error: %p\n", errbuf);
+    printf("Error: %p\n", errbuf);
 }
 
 
@@ -155,7 +155,7 @@ User* db_getUser(const char* user_id) {
         // => 해당 user_id가 없는 경우
         free(user);
         user = NULL;
-        printf("등록된 id가 없습니다");
+        // printf("등록된 id가 없습니다");
     }
     else if (status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO) {
         // => 에러
@@ -324,7 +324,6 @@ Asset* db_getUserAsset(const char* user_id)
 
         OCIHandleFree(stmt, OCI_HTYPE_STMT);
     }
-    db_disconnect();
 
 
     // --------------------------
@@ -337,14 +336,14 @@ Asset* db_getUserAsset(const char* user_id)
     // 만약 하나도 없으면 stockArray == NULL
     if (stockArray) {
         assets[IDX_STOCK].data.stock.user_stock = stockArray;
-        // 필요하면 assets[1].stock_count = stockCount; // 등등
+        assets[IDX_STOCK].data.stock.stock_count = stockCount;
     } else {
         assets[IDX_STOCK].data.stock.user_stock = NULL;
-        // count=0 => 주식 없음
+        assets[IDX_STOCK].data.stock.stock_count = 0;
     }
 
     // 3) DB 해제
-    // db_disconnect();
+    db_disconnect();
 
     // 4) 2개짜리 Asset 배열 리턴
     return assets;
@@ -357,11 +356,6 @@ User_Stock* db_getUserStockList(const char *user_id, int *outCount)
         return NULL;
     }
     *outCount = 0;  // 초기화
-
-    if (db_connect() != 0) {
-        fprintf(stderr, "[db_getUserStock] DB 연결 실패\n");
-        return NULL;
-    }
 
     // --------------------------------------------------
     // (A) 먼저 보유 주식 수(count) 파악
@@ -421,7 +415,7 @@ User_Stock* db_getUserStockList(const char *user_id, int *outCount)
     // (C) 주식 목록 SELECT (JOIN STOCK)
     // --------------------------------------------------
     const char *sql_user_stocks =
-        "SELECT us.USER_STOCK_ID, us.STOCK_ID, s.NAME, us.QUANTITY, us.TOTAL_PRICE, s.PRICE"
+        "SELECT us.USER_STOCK_ID, us.STOCK_ID, s.NAME, us.QUANTITY, us.TOTAL_PRICE, s.PRICE "
         "FROM USER_STOCK us, STOCK s "
         "WHERE us.USER_ID = :1 AND us.STOCK_ID = s.STOCK_ID";
 
@@ -485,7 +479,6 @@ OCIDefineByPos(stmt, &def6, errhp, 6, &current_price,   sizeof(current_price),  
 
     OCIHandleFree(stmt, OCI_HTYPE_STMT);
 
-    db_disconnect();
     // 반환
     return stockArray;
 
@@ -863,4 +856,212 @@ bool db_checkStockName(char *stock_name) {
     } else {
         return false; // 존재하지 않음 or 에러
     }
+}
+
+int db_insertUserChat(Chat new_chat) {
+    if (!new_chat.user_id[0] || !new_chat.title[0] || !new_chat.content[0]) {
+        fprintf(stderr, "[db_insertUserChat] 필수 값 누락\n");
+        return -1;
+    }
+
+    if (db_connect() != 0) {
+        fprintf(stderr, "[db_insertUserChat] DB 연결 실패\n");
+        return -1;
+    }
+
+    const char* sql =
+        "INSERT INTO CHAT (USER_ID, TITLE, SUMMARY, CONTENT) "
+        "VALUES (:1, :2, :3, :4)";
+
+    OCIStmt *stmt = NULL;
+    sword status;
+
+    status = OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
+    if (status != OCI_SUCCESS) {
+        fprintf(stderr, "[db_insertUserChat] 스테이트먼트 핸들 생성 실패\n");
+        db_disconnect();
+        return -1;
+    }
+
+    status = OCIStmtPrepare(stmt, errhp, (text*)sql, (ub4)strlen(sql),
+                            OCI_NTV_SYNTAX, OCI_DEFAULT);
+    if (status != OCI_SUCCESS) {
+        fprintf(stderr, "[db_insertUserChat] SQL 준비 실패\n");
+        OCIHandleFree(stmt, OCI_HTYPE_STMT);
+        db_disconnect();
+        return -1;
+    }
+
+    OCIBind *bnd1 = NULL, *bnd2 = NULL, *bnd3 = NULL, *bnd4 = NULL;
+
+    OCIBindByPos(stmt, &bnd1, errhp, 1,
+                 (dvoid*)new_chat.user_id, strlen(new_chat.user_id) + 1,
+                 SQLT_STR, NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+    OCIBindByPos(stmt, &bnd2, errhp, 2,
+                 (dvoid*)new_chat.title, strlen(new_chat.title) + 1,
+                 SQLT_STR, NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+    OCIBindByPos(stmt, &bnd3, errhp, 3,
+                 (dvoid*)new_chat.summary, strlen(new_chat.summary) + 1,
+                 SQLT_STR /* CLOB을 TEXT로 전달 */, NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+    OCIBindByPos(stmt, &bnd4, errhp, 4,
+                 (dvoid*)new_chat.content, strlen(new_chat.content) + 1,
+                 SQLT_STR /* CLOB을 TEXT로 전달 */, NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+
+    status = OCIStmtExecute(svchp, stmt, errhp, 1, 0, NULL, NULL, OCI_DEFAULT);
+    if (status != OCI_SUCCESS) {
+        fprintf(stderr, "[db_insertUserChat] INSERT 실패\n");
+        check_error(errhp);
+        OCIHandleFree(stmt, OCI_HTYPE_STMT);
+        db_disconnect();
+        return -1;
+    }
+
+    OCITransCommit(svchp, errhp, 0);
+
+    OCIHandleFree(stmt, OCI_HTYPE_STMT);
+    db_disconnect();
+    return 0;
+}
+
+Chat* db_getUserChats(char *user_id, int *chat_count)
+{
+    if (!user_id || !chat_count) {
+        return NULL;
+    }
+
+    if (db_connect() != 0) {
+        fprintf(stderr, "[db_insertUserChat] DB 연결 실패\n");
+        return NULL;
+    }
+
+    *chat_count = 0;  // 초기화
+
+    // --------------------------------------------------
+    // (A) 먼저 보유 채팅 개수(count) 파악
+    // --------------------------------------------------
+    const char *sql_count = "SELECT COUNT(*) FROM CHAT WHERE USER_ID = :1";
+
+    OCIStmt *stmt = NULL;
+    OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
+
+    OCIStmtPrepare(stmt, errhp, (text*)sql_count, (ub4)strlen(sql_count),
+                   OCI_NTV_SYNTAX, OCI_DEFAULT);
+
+    // 바인딩
+    {
+        OCIBind *bnd1 = NULL;
+        OCIBindByPos(stmt, &bnd1, errhp, 1,
+                     (dvoid*)user_id,
+                     (sb4)(strlen(user_id) + 1),
+                     SQLT_STR,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    }
+
+    // Define: count 값 받을 변수
+    int countVal = 0;
+    {
+        OCIDefine *def1 = NULL;
+        OCIDefineByPos(stmt, &def1, errhp, 1, &countVal, sizeof(countVal),
+                       SQLT_INT, NULL, NULL, NULL, OCI_DEFAULT);
+    }
+
+    sword status = OCIStmtExecute(svchp, stmt, errhp, 0, 0, NULL, NULL, OCI_DEFAULT);
+    status = OCIStmtFetch2(stmt, errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT);
+    if (status == OCI_SUCCESS) {
+        *chat_count = countVal;  // 채팅 개수 저장
+    }
+    OCIHandleFree(stmt, OCI_HTYPE_STMT);
+
+    if (*chat_count <= 0) {
+        // 보유 채팅이 없는 경우
+        return NULL;
+    }
+
+    // --------------------------------------------------
+    // (B) count 크기만큼 배열 할당
+    // --------------------------------------------------
+    Chat *chatArray = (Chat*)malloc(sizeof(Chat) * (*chat_count));
+    if (!chatArray) {
+        fprintf(stderr, "[db_getUserChats] malloc failed.\n");
+        return NULL;
+    }
+    memset(chatArray, 0, sizeof(Chat) * (*chat_count));
+
+    // --------------------------------------------------
+    // (C) 채팅 목록 SELECT
+    // --------------------------------------------------
+    const char *sql_select =
+        "SELECT CHAT_ID, USER_ID, TITLE, SUMMARY, CONTENT, "
+        "TO_CHAR(CREATED_AT, 'YYYY-MM-DD HH24:MI:SS'), "
+        "TO_CHAR(UPDATED_AT, 'YYYY-MM-DD HH24:MI:SS'), "
+        "TO_CHAR(DELETED_AT, 'YYYY-MM-DD HH24:MI:SS') "
+        "FROM CHAT WHERE USER_ID = :1 ORDER BY CREATED_AT DESC";
+
+    OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
+    OCIStmtPrepare(stmt, errhp, (text*)sql_select, (ub4)strlen(sql_select),
+                   OCI_NTV_SYNTAX, OCI_DEFAULT);
+    {
+        OCIBind *bnd1 = NULL;
+        OCIBindByPos(stmt, &bnd1, errhp, 1,
+                     (dvoid*)user_id,
+                     (sb4)(strlen(user_id) + 1),
+                     SQLT_STR,
+                     NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
+    }
+    OCIStmtExecute(svchp, stmt, errhp, 0, 0, NULL, NULL, OCI_DEFAULT);
+
+    // Define 변수 설정
+    int   chat_id;
+    char  db_user_id[256] = {0};
+    char  title[256] = {0};
+    char  summary[4096] = {0};
+    char  content[8192] = {0};
+    char  created_at[64] = {0};
+    char  updated_at[64] = {0};
+    char  deleted_at[64] = {0};
+
+    OCIDefine *def1_chat = NULL, *def2_chat = NULL, *def3_chat = NULL,
+               *def4_chat = NULL, *def5_chat = NULL, *def6_chat = NULL,
+               *def7_chat = NULL, *def8_chat = NULL;
+
+    OCIDefineByPos(stmt, &def1_chat, errhp, 1, &chat_id, sizeof(chat_id),
+                   SQLT_INT, NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def2_chat, errhp, 2, db_user_id, sizeof(db_user_id),
+                   SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def3_chat, errhp, 3, title, sizeof(title),
+                   SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def4_chat, errhp, 4, summary, sizeof(summary),
+                   SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def5_chat, errhp, 5, content, sizeof(content),
+                   SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def6_chat, errhp, 6, created_at, sizeof(created_at),
+                   SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def7_chat, errhp, 7, updated_at, sizeof(updated_at),
+                   SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT);
+    OCIDefineByPos(stmt, &def8_chat, errhp, 8, deleted_at, sizeof(deleted_at),
+                   SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT);
+
+    // Fetch count번 반복하여 각 채팅 레코드 저장
+    int idx = 0;
+    while ((status = OCIStmtFetch2(stmt, errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)) == OCI_SUCCESS)
+    {
+        chatArray[idx].chat_id   = chat_id;
+        chatArray[idx].user_id   = strdup(db_user_id);
+        chatArray[idx].title     = strdup(title);
+        chatArray[idx].summary   = strdup(summary);
+        chatArray[idx].content   = strdup(content);
+        chatArray[idx].created_at = strdup(created_at);
+        chatArray[idx].updated_at = strdup(updated_at);
+        chatArray[idx].deleted_at = strdup(deleted_at);
+        idx++;
+    }
+
+    OCIHandleFree(stmt, OCI_HTYPE_STMT);
+
+    db_disconnect();
+
+    return chatArray;
 }

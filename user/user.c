@@ -6,6 +6,8 @@
 
 #include "../chatbot/chatbot.h"
 #include "../file/file.h"
+#include "../db/db.h"
+
 
 char g_chatbot_name[20] = "???";
 User* g_user_data = NULL;

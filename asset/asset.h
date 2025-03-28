@@ -24,7 +24,6 @@ typedef struct User_Stock {
     int quantity;
     double total_price; // 주식 별 총액
     double current_price; // 주식 현재가
-
 } User_Stock;
 
 typedef union {

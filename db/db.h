@@ -4,10 +4,12 @@
 #define IDX_CASH 0
 #define IDX_STOCK 1
 #include <stdbool.h>
+#include "../chatbot/chatbot.h"
 
 typedef struct User User;
 typedef struct Asset Asset;
 typedef struct User_Stock User_Stock;
+// typedef struct Chat Chat;
 
 
 
@@ -19,6 +21,7 @@ int db_updateAsset(int asset_id, double delta);
 int db_updateUserStock(const char* user_id, const char* stock_name, int quantity, double price);
 int db_insertUserStock(const char* user_id, const char* stock_name, int quantity, double total_price);
 bool db_checkStockName(char *stock_name);
-
+int db_insertUserChat(Chat new_chat);
+Chat* db_getUserChats(char *user_id, int *chat_count);
 
 #endif // DB_H

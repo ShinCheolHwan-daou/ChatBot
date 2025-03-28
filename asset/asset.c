@@ -3,6 +3,7 @@
 //
 
 #include "asset.h"
+#include "../db/db.h"
 
 const char *asset_type_strings[] = {
     "현금자산",
@@ -194,6 +195,9 @@ static void modify_stock() {
             scanf("%d", &quantity);
             printf("%s) 매수할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
             scanf("%lf", &price);
+            // db_updateUserStock(g_user_data->user_id, stock_name, quantity, price);
+            // printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+
             break;
         case 2:
             asset_method = -1;
