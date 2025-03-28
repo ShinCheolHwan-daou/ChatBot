@@ -23,7 +23,7 @@ void check_error(OCIError* errhp) {
     sb4 errcode = 0;
     OCIErrorGet((dvoid*)errhp, (ub4)1, (text*)NULL, &errcode, errbuf, (ub4)sizeof(errbuf),
         OCI_HTYPE_ERROR);
-    printf("Error: %p\n", errbuf);
+    // printf("Error: %p\n", errbuf);
 }
 
 
