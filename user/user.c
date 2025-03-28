@@ -72,8 +72,8 @@ int user_login_page() {
 int user_run_main_page() {
     int choice;
     printf("\n=================<MENU>===============\n");
-    printf("[1] 자산 현황 확인\n");
-    printf("[2] 자산 현황 출력\n");
+    printf("[1] 나의 자산 현황\n");
+    printf("[2] 자산 현황 파일로 저장\n");
     printf("[3] 자산 조정\n");
     printf("[4] 챗봇과 자산관리 채팅\n");
     printf("[5] 과거 ai 자산관리 가이드 출력\n");

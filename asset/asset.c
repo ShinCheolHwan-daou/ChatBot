@@ -19,9 +19,7 @@ void asset_print_asset() {
     printf("[주식자산] 총 %.2f원\n", asset_data[IDX_STOCK].amount);
 
     User_Stock *stock_data = asset_data[IDX_STOCK].data.stock.user_stock;
-    printf("총 데이터: %d\n", asset_data[IDX_STOCK].data.stock.stock_count);
     if (stock_data != NULL) {
-        printf("데이터 있음\n");
         for (int i = 0; i < asset_data[IDX_STOCK].data.stock.stock_count; i++) {
             printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
                 stock_data[i].stock_name,
@@ -198,7 +196,24 @@ static void modify_stock() {
             break;
         case 2:
             asset_method = -1;
-            printf("%s) 매도할 종목의 이름을 알려주세요!\n>>", g_chatbot_name);
+
+        //================================================
+            Asset *asset_datas = db_getUserAsset(g_user_data->user_id);
+            User_Stock *stock_data = asset_datas[IDX_STOCK].data.stock.user_stock;
+            printf("%s) 현재 보유 주식은 다음과 같아요!\n", g_chatbot_name);
+            if (stock_data != NULL) {
+                for (int i = 0; i < asset_datas[IDX_STOCK].data.stock.stock_count; i++) {
+                    printf("\t%d) 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
+                        i + 1,
+                        stock_data[i].stock_name,
+                        stock_data[i].quantity,
+                        stock_data[i].total_price / stock_data[i].quantity,
+                        stock_data[i].total_price);
+                }
+            }
+            free_asset(asset_datas);
+        //================================================
+            printf("\n%s) 매도할 종목의 이름을 알려주세요!\n>>", g_chatbot_name);
             scanf("%s", stock_name);
             if (db_checkStockName(stock_name) == false) {
                 printf("%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
