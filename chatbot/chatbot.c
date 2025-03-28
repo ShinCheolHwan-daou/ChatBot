@@ -12,7 +12,6 @@
 #define ROLE_LENGTH 10
 #define CONTENT_LENGTH 4096
 
-
 // 응답 데이터를 저장할 버퍼 구조체
 typedef struct {
     char *data;
@@ -26,9 +25,10 @@ typedef struct {
 
 char *perplexity_api_key;
 
-void add_message(Message *messages, int *message_length, Message new_message) {
+static void add_message(Message *messages, int *message_length, Message new_message) {
     if (messages == NULL) {
         perror("messages should not be null.\n");
+        return;
     }
 
     if (sizeof(messages) / sizeof(Message) >= *message_length) {
@@ -44,8 +44,7 @@ void add_message(Message *messages, int *message_length, Message new_message) {
     (*message_length)++;
 }
 
-// 응답 데이터를 저장할 콜백 함수
-size_t write_callback(void *ptr, size_t size, size_t nmemb, void *userdata) {
+static size_t write_callback(void *ptr, size_t size, size_t nmemb, void *userdata) {
     size_t total_size = size * nmemb;
     ResponseData *response = userdata;
 
@@ -64,7 +63,7 @@ size_t write_callback(void *ptr, size_t size, size_t nmemb, void *userdata) {
     return total_size;
 }
 
-char *create_messages_json(const int message_length, const Message *messages) {
+static char *create_messages_json(const int message_length, const Message *messages) {
     cJSON *messages_json = cJSON_CreateArray();
     for (int i = 0; i < message_length; i++) {
         cJSON *message_json = cJSON_CreateObject();
@@ -77,8 +76,7 @@ char *create_messages_json(const int message_length, const Message *messages) {
     return json_str;
 }
 
-// JSON 데이터 생성 함수
-char *create_request_body(const int message_length, const Message *messages) {
+static char *create_request_body(const int message_length, const Message *messages) {
     cJSON *json = cJSON_CreateObject();
     cJSON_AddStringToObject(json, "model", "sonar");
 
@@ -95,8 +93,7 @@ char *create_request_body(const int message_length, const Message *messages) {
     return json_str; // 동적으로 할당된 문자열 반환 (free 필요)
 }
 
-
-Message parse_response_to_message(const char *json_str) {
+static Message parse_response_to_message(const char *json_str) {
     // JSON 파서 생성
     cJSON *json = cJSON_Parse(json_str);
     Message answer = {};
@@ -118,7 +115,7 @@ Message parse_response_to_message(const char *json_str) {
     return answer;
 }
 
-Message chatbot_chat_completions(const Message *messages, int message_length) {
+static Message chatbot_chat_completions(const Message *messages, int message_length) {
     CURL *curl;
     CURLcode res;
 
@@ -171,14 +168,18 @@ Message chatbot_chat_completions(const Message *messages, int message_length) {
     return answer;
 }
 
-
 void chatbot_chat() {
-    fflush(stdin);
+    getchar();
     if (g_user_data == NULL) {
         perror("Need user data.\n");
+        return;
     }
 
     perplexity_api_key = getenv("PERPLEXITY_API_KEY");
+    if (perplexity_api_key == NULL) {
+        perror("Failed to get PERPLEXITY_API_KEY.\n");
+        return;
+    }
 
     printf("%s님 반갑습니다!\n", g_user_data->name);
     printf("챗봇을 중단하려면 quit 또는 q를 입력하세요.\n");
@@ -208,11 +209,12 @@ void chatbot_chat() {
 
 
     while (true) {
-        Message question = {"user"};
         fflush(stdin);
+        Message question = {"user"};
         printf("\n질문을 입력해주세요: ");
         if (fgets(question.content, sizeof(question.content), stdin) == NULL) {
             perror("Error reading input.\n");
+            continue;
         }
 
         if (strcmp(question.content, "") == 0 || strcmp(question.content, "\n") == 0) {
@@ -228,6 +230,12 @@ void chatbot_chat() {
         Message answer = chatbot_chat_completions(messages, message_length);
         add_message(messages, &message_length, answer);
         printf("%s\n", answer.content);
+    }
+
+    // 질문을 안했을 경우, return
+    if (sizeof(system_messages) / sizeof(Message) == message_length) {
+        free(messages);
+        return;
     }
 
     // 1. 제목 생성
@@ -251,11 +259,10 @@ void chatbot_chat() {
     new_chat.summary = summary.content;
     new_chat.content = messages_str;
 
-    printf("title: %s\n", new_chat.title);
-    printf("summary: %s\n", new_chat.summary);
-    printf("content: %s\n", new_chat.content);
+    printf("제목: %s\n", new_chat.title);
+    printf("요약: %s\n", new_chat.summary);
 
-    // todo:: db에 저장
+    // todo::
     // db_insertUserChat(new_chat);
 
     free(messages_str);
