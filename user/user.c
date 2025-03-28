@@ -31,7 +31,7 @@ int user_login_page() {
     char user_id[CHAR_LEN];
     char password[CHAR_LEN];
 
-    user_print_ascii_art();
+    // user_print_ascii_art();
     printf("\n============================================\n");
     printf("DAOU 자산관리 시스템에 오신 것을 환영합니다.\n");
     printf("============================================\n");
