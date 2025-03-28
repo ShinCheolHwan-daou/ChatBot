@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <cjson/cJSON.h>
 
-// todo::
 void file_export_json() {
     Asset *assets = db_getUserAsset(g_user_data->user_id);
     int chat_count = 0;
@@ -91,4 +90,10 @@ void file_export_json() {
     }
     free(chats);
     cJSON_free(json);
+
+    printf("파일 저장에 성공했습니다.\n");
+    printf("http://192.168.31.102:3000에서 결과보고서를 확인하세요!\n");
+    printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+    getchar();
+    getchar();
 }
