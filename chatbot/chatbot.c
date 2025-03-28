@@ -194,12 +194,12 @@ void chatbot_chat() {
         },
         {
             "system",
-            "너는 지금부터 고객 자금 관리 시스템을 가지고 상담원 역할을 할거야."
+            "Rules: 1. Provide only the final answer. 2. Do not provide any external website link."
         },
         {
             "system",
-            "유저의 질문에 대한 답을 자산 관리와 연관시켜서 대답해줘."
-        }
+            "Steps: 1. Answer the user's question. 2. Add an answer that can help user manage his assets in that situation."
+        },
     };
 
     for (int i = 0; i < sizeof(system_messages) / sizeof(Message); i++) {
@@ -263,7 +263,6 @@ void chatbot_chat() {
     printf("제목: %s\n", new_chat.title);
     printf("요약: %s\n", new_chat.summary);
 
-    // todo::
     db_insertUserChat(new_chat);
 
     free(messages_str);
