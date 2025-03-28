@@ -26,7 +26,7 @@ void asset_print_asset() {
             printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
                 stock_data[i].stock_name,
                 stock_data[i].quantity,
-                stock_data[i].current_price / stock_data[i].quantity,
+                stock_data[i].total_price / stock_data[i].quantity,
                 stock_data[i].total_price);
         }
     }
@@ -195,9 +195,6 @@ static void modify_stock() {
             scanf("%d", &quantity);
             printf("%s) 매수할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
             scanf("%lf", &price);
-            // db_updateUserStock(g_user_data->user_id, stock_name, quantity, price);
-            // printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
-
             break;
         case 2:
             asset_method = -1;
@@ -211,19 +208,19 @@ static void modify_stock() {
             User_Stock *asset_data = db_getUserStock(g_user_data->user_id, stock_name);
             printf("%s) 매도할 종목의 개수를 알려주세요! (현재 보유수: %d개)\n>>",
                 g_chatbot_name,
-                asset_data == NULL ? 0 : asset_data[IDX_STOCK].quantity);
+                asset_data == NULL ? 0 : asset_data->quantity);
             scanf("%d", &quantity);
-            printf("%s) 매도할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
-            scanf("%lf", &price);
             if (asset_data == NULL || asset_data[IDX_STOCK].quantity < quantity) {
                 printf("%s) 매도할 보유주식이 적어요!\n", g_chatbot_name);
                 printf("%s) 현재 %s 보유주식: %d개\n",
                        g_chatbot_name,
                        stock_name,
-                       asset_data == NULL ? 0 : asset_data[IDX_STOCK].quantity);
+                       asset_data == NULL ? 0 : asset_data->quantity);
                 free(asset_data);
                 return;
             }
+            printf("%s) 매도할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
+            scanf("%lf", &price);
             free(asset_data);
             break;
         default:
