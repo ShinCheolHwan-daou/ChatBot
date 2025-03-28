@@ -960,6 +960,9 @@ Chat* db_getUserChats(char *user_id, int *chat_count)
                      NULL, NULL, NULL, 0, NULL, OCI_DEFAULT);
     }
 
+    OCIStmtExecute(svchp, stmt, errhp, 0, 0, NULL, NULL, OCI_DEFAULT);
+
+
     // Define: count 값 받을 변수
     int countVal = 0;
     {
@@ -968,8 +971,7 @@ Chat* db_getUserChats(char *user_id, int *chat_count)
                        SQLT_INT, NULL, NULL, NULL, OCI_DEFAULT);
     }
 
-    sword status = OCIStmtExecute(svchp, stmt, errhp, 0, 0, NULL, NULL, OCI_DEFAULT);
-    status = OCIStmtFetch2(stmt, errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT);
+    sword status = OCIStmtFetch2(stmt, errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT);
     if (status == OCI_SUCCESS) {
         *chat_count = countVal;  // 채팅 개수 저장
     }
@@ -1022,6 +1024,7 @@ Chat* db_getUserChats(char *user_id, int *chat_count)
     char  created_at[64] = {0};
     char  updated_at[64] = {0};
     char  deleted_at[64] = {0};
+    sb2 ind_deleted_at = 0;
 
     OCIDefine *def1_chat = NULL, *def2_chat = NULL, *def3_chat = NULL,
                *def4_chat = NULL, *def5_chat = NULL, *def6_chat = NULL,
@@ -1042,7 +1045,17 @@ Chat* db_getUserChats(char *user_id, int *chat_count)
     OCIDefineByPos(stmt, &def7_chat, errhp, 7, updated_at, sizeof(updated_at),
                    SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT);
     OCIDefineByPos(stmt, &def8_chat, errhp, 8, deleted_at, sizeof(deleted_at),
-                   SQLT_STR, NULL, NULL, NULL, OCI_DEFAULT);
+                    SQLT_STR, &ind_deleted_at, NULL, NULL, OCI_DEFAULT);
+
+
+    // status = OCIStmtExecute(svchp, stmt, errhp, 1, 0, NULL, NULL, OCI_DEFAULT);
+    // if (status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO) {
+    //     char errbuf[512];
+    //     sb4 errcode = 0;
+    //     OCIErrorGet(errhp, 1, NULL, &errcode, (text*)errbuf, sizeof(errbuf), OCI_HTYPE_ERROR);
+    //     fprintf(stderr, "[db_getUserChats] SELECT 실행 실패: %s\n", errbuf);
+    //     // 에러 처리...
+    // }
 
     // Fetch count번 반복하여 각 채팅 레코드 저장
     int idx = 0;
