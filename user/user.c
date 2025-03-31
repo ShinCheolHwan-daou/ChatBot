@@ -31,48 +31,13 @@ void user_print_ascii_art() {
     colorPrintf(text_colors[0], BLACK, "██╔═██╗  ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "██║███╗██║ ");colorPrintf(text_colors[3], BLACK, "██║   ██║ ");colorPrintf(text_colors[4], BLACK, "██║   ██║ ");colorPrintf(text_colors[5], BLACK, "██║╚██╔╝██║ ");colorPrintf(text_colors[6], BLACK, "██╔══╝  \n");
     colorPrintf(text_colors[0], BLACK, "██║  ██╗ ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "╚███╔███╔╝ ");colorPrintf(text_colors[3], BLACK, "╚██████╔╝ ");colorPrintf(text_colors[4], BLACK, "╚██████╔╝ ");colorPrintf(text_colors[5], BLACK, "██║ ╚═╝ ██║ ");colorPrintf(text_colors[6], BLACK, "███████╗\n");
     colorPrintf(text_colors[0], BLACK, "╚═╝  ╚═╝ ");colorPrintf(text_colors[1], BLACK, "╚═╝ ");colorPrintf(text_colors[2], BLACK, " ╚══╝╚══╝  ");colorPrintf(text_colors[3], BLACK, " ╚═════╝  ");colorPrintf(text_colors[4], BLACK, " ╚═════╝  ");colorPrintf(text_colors[5], BLACK, "╚═╝     ╚═╝ ");colorPrintf(text_colors[6], BLACK, "╚══════╝\n");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 int user_login_page() {
     char user_id[CHAR_LEN];
 
     user_print_ascii_art();
+    // todo:: [재진] 사용설명
     // printf("\n============================================\n");
     // printf("🔐 DAOU 자산관리 시스템에 오신 것을 환영합니다.\n");
     // printf("============================================\n");
@@ -127,6 +92,7 @@ int user_login_page() {
     return LOGIN_FAILED;
 }
 
+// todo:: [지현] 워딩정리
 const char *menu[] = {
     "[1] 나의 자산 현황 확인",
     "[2] 자산 현황 파일로 저장",
