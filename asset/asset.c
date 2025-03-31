@@ -246,7 +246,7 @@ static void modify_stock() {
     int stock_id = asset_data[IDX_STOCK].asset_id;
     free_asset(asset_data);
     db_updateAsset(stock_id, price * quantity * asset_method);
-    db_updateUserStock(g_user_data->user_id, stock_name, asset_method * quantity, asset_method * price);
+    db_updateUserStock(g_user_data->user_id, stock_name, asset_method * quantity, quantity * asset_method * price);
     printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
 }
 
