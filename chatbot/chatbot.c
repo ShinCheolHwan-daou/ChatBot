@@ -208,7 +208,7 @@ void chatbot_chat() {
 
     while (true) {
         print_clear();
-        print_color(GRAY, BLACK,"키우ME을 중단하려면 quit 또는 q를 입력하세요.\n");
+        print_color(GRAY, BLACK,"키우ME와 대화를 중단하려면 quit 또는 q를 입력하세요.\n");
         Message question = {"user"};
         printf("\n질문을 입력해주세요: ");
         if (fgets(question.content, sizeof(question.content), stdin) == NULL) {
