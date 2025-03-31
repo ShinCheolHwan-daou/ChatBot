@@ -156,11 +156,13 @@ static void save_text(Asset *asset) {
     User_Stock *stock_data = asset[IDX_STOCK].data.stock.user_stock;
     if (stock_data != NULL) {
         for (int i = 0; i < asset[IDX_STOCK].data.stock.stock_count; i++) {
-            printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
-                   stock_data[i].stock_name,
-                   stock_data[i].quantity,
-                   stock_data[i].current_price / stock_data[i].quantity,
-                   stock_data[i].total_price);
+            if (stock_data[i].quantity > 0) {
+                fprintf(f, "- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
+                        stock_data[i].stock_name,
+                        stock_data[i].quantity,
+                        stock_data[i].current_price / stock_data[i].quantity,
+                        stock_data[i].total_price);
+            }
         }
     }
     fclose(f);
