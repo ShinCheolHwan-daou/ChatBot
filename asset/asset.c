@@ -192,6 +192,10 @@ static void modify_stock() {
             }
             printf("%s) 매수할 종목의 개수를 알려주세요!\n>>", g_chatbot_name);
             scanf("%d", &quantity);
+            if (quantity == 0) {
+                printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+                return;
+            }
             printf("%s) 매수할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
             scanf("%lf", &price);
             break;
@@ -227,6 +231,11 @@ static void modify_stock() {
                 g_chatbot_name,
                 asset_data == NULL ? 0 : asset_data->quantity);
             scanf("%d", &quantity);
+            if (quantity == 0) {
+                free(asset_data);
+                printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+                return;
+            }
             if (asset_data == NULL || asset_data->quantity < quantity) {
                 printf("%s) 매도할 보유주식이 적어요!\n", g_chatbot_name);
                 printf("%s) 현재 %s 보유주식: %d개\n",
