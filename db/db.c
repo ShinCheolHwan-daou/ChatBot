@@ -369,7 +369,7 @@ User_Stock* db_getUserStockList(const char *user_id, int *outCount)
     // --------------------------------------------------
     // (A) 먼저 보유 주식 수(count) 파악
     // --------------------------------------------------
-    const char *sql_count = "SELECT COUNT(*) FROM USER_STOCK WHERE USER_ID=:1";
+    const char *sql_count = "SELECT COUNT(*) FROM USER_STOCK WHERE USER_ID=:1 AND QUANTITY > 0";
 
     OCIStmt *stmt = NULL;
     OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
