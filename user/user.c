@@ -94,19 +94,20 @@ int user_login_page() {
 
 // todo:: [지현] 워딩정리
 const char *menu[] = {
-    "[1] 나의 자산 현황 확인",
-    "[2] 자산 현황 파일로 저장",
-    "[3] 자산 조정",
-    "[4] 챗봇과 자산관리 채팅",
-    "[5] 과거 ai 자산관리 가이드 파일로 저장",
-    "[6] 종료"
+    "📊 내 자산 한눈에 보기",
+    "💾 내 자산 저장하기",
+    "✏️ 내 자산 수정하기",
+    "💬 AI 챗봇과 대화하기",
+    "📚 AI 추천 가이드 저장하기",
+    "🚪 종료하기"
 };
+
 int selected_option = 0; // Tracks the currently selected menu option
 const int menu_size = sizeof(menu) / sizeof(menu[0]);
 
 void print_menu(int selected) {
     system("cls"); // Clear the console screen
-    printf("\n=================<MENU>===============\n");
+    printf("\n=================<MENU>===============\n\n");
     for (int i = 0; i < menu_size; i++) {
         if (i == selected) {
             printf(">> %s <<\n", menu[i]); // Highlight the selected option
@@ -114,7 +115,7 @@ void print_menu(int selected) {
             printf("   %s\n", menu[i]);
         }
     }
-    printf("======================================\n");
+    printf("\n======================================\n");
 }
 
 int user_run_main_page() {
