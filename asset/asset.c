@@ -225,7 +225,7 @@ static void modify_stock() {
                 g_chatbot_name,
                 asset_data == NULL ? 0 : asset_data->quantity);
             scanf("%d", &quantity);
-            if (asset_data == NULL || asset_data[IDX_STOCK].quantity < quantity) {
+            if (asset_data == NULL || asset_data->quantity < quantity) {
                 printf("%s) 매도할 보유주식이 적어요!\n", g_chatbot_name);
                 printf("%s) 현재 %s 보유주식: %d개\n",
                        g_chatbot_name,
@@ -246,7 +246,7 @@ static void modify_stock() {
     int stock_id = asset_data[IDX_STOCK].asset_id;
     free_asset(asset_data);
     db_updateAsset(stock_id, price * quantity * asset_method);
-    db_updateUserStock(g_user_data->user_id, stock_name, asset_method * quantity, asset_method * price);
+    db_updateUserStock(g_user_data->user_id, stock_name, asset_method * quantity, quantity * asset_method * price);
     printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
 }
 
