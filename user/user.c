@@ -81,17 +81,25 @@ int user_login_page() {
     // printf("🔐 DAOU 자산관리 시스템에 오신 것을 환영합니다.\n");
     // printf("============================================\n");
 
-    printf("%s) ID를 입력해주세요!\n>> ", g_chatbot_name);
+    printf("\n%s)\t😊 안녕하세요! 저는 ai 챗봇 키우ME 입니다!\n", g_chatbot_name);
+    printf("\t✅ 저는 고객님의 자산관리를 도와주며,\n");
+    printf("\t✅ 다양한 주제에 대해 대답해 드리는 역할을 합니다.\n", g_chatbot_name);
+    printf("\n(Enter를 눌러 계속...)");
+    getchar();
+    system("cls"); // Clear the console screen
+
+    printf("%s)\t 고객님의 ID를 입력해주세요!\n>> ", g_chatbot_name);
     while (1) {
         scanf("%s", user_id);
         g_user_data = db_getUser(user_id);
         if (g_user_data == NULL) {
-            printf("%s) ID와 일치하는 회원 정보가 없습니다.\n", g_chatbot_name);
-            printf("%s) ID를 다시 입력해주세요!\n>> ", g_chatbot_name);
+            printf("\n%s)\t❌ ID와 일치하는 회원 정보가 없습니다.\n", g_chatbot_name);
+            printf("%s)\tID를 다시 입력해주세요!\n>> ", g_chatbot_name);
         } else {
             break;
         }
     }
+    printf("\n");
 
     int life = 3;
     int i = 0;
@@ -99,7 +107,7 @@ int user_login_page() {
     while (life--) {
         char password[CHAR_LEN] = {0};
         int i = 0;
-        printf("%s) 비밀번호를 입력해주세요!\n>> ", g_chatbot_name);
+        printf("%s)\t 비밀번호를 입력해주세요!\n>> ", g_chatbot_name);
         while (1) {
             ch = getch(); // 키 입력 받기 (화면에 표시되지 않음)
             if (ch == '\r') {
@@ -119,16 +127,20 @@ int user_login_page() {
         printf("\n");
 
         if (strcmp(g_user_data->password, password) == 0) {
-            printf("%s) 감사합니다! 이제 DAOU 자산관리 시스템 시작합니다!\n", g_chatbot_name);
             getchar();
-            printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+            printf("\n%s)\t✨ 환영합니다 %s 고객님!\n", g_chatbot_name, g_user_data->name);
+            printf("\t키우ME 서비스를 시작합니다~\n");
+            printf("\n(Enter를 눌러 계속...)\n");
             getchar();
             return LOGIN_SUCCESS;
         } else {
-            printf("%s) 비밀번호가 틀렸습니다. (남은 기회: %d번)\n", g_chatbot_name, life);
+            printf("\n%s)\t❌ 비밀번호가 틀렸습니다. (남은 기회: %d번)\n", g_chatbot_name, life);
         }
     }
-    printf("%s) 비밀번호를 3회 이상 틀리셔서 접근이 차단되었습니다.\n", g_chatbot_name);
+    printf("%s)\t😭 비밀번호를 3회 이상 틀리셔서 접근이 차단되었습니다.\n", g_chatbot_name);
+    getchar();
+    printf("\n(Enter를 눌러 나가기...)\n");
+    getchar();
     return LOGIN_FAILED;
 }
 
