@@ -26,7 +26,8 @@ add_executable(ChatBot main.c
         asset/asset.h
         dotenv/dotenv.c
         dotenv/dotenv.h
-        color/color.c
-        color/color.h)
+        print/print.c
+        print/print.h
+)
 
 target_link_libraries(ChatBot oci CURL::libcurl cjson)

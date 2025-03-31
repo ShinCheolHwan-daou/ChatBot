@@ -1,0 +1,64 @@
+#include "print.h"
+
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <conio.h> // For _getch() on Windows
+#include <windows.h> // For system("cls") on Windows
+
+
+static void print_menu(int selected, const char *menu[], int menu_size);
+
+void setColor(int text, int background) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), background * 16 + text);
+}
+
+void print_color(int textColor, int bgColor, const char *format, ...) {
+    setColor(textColor, bgColor);
+
+    va_list args;
+    va_start(args, format);
+    vprintf(format, args);
+    va_end(args);
+
+    setColor(WHITE, BLACK); // 기본 색상 복구
+}
+
+int select_menu(const char *start_str, const char *menu[], int menu_size) {
+    int selected_option = 0;
+    int key;
+
+    while (true) {
+        system("cls"); // Clear the console screen
+        if (start_str != NULL) {
+            printf("%s\n\n", start_str);
+        }
+        print_menu(selected_option, menu, menu_size);
+        printf("\n위/아래 방향키로 선택하고 Enter 키를 눌러 확인하세요.\n");
+        key = _getch();
+
+        if (key == 224) {
+            // Arrow keys are preceded by 224 on Windows
+            key = _getch(); // Get the actual key code
+            if (key == 72) {
+                // Up arrow key
+                selected_option = (selected_option - 1 + menu_size) % menu_size;
+            } else if (key == 80) {
+                // Down arrow key
+                selected_option = (selected_option + 1) % menu_size;
+            }
+        } else if (key == 13) {
+            return selected_option;
+        }
+    }
+}
+
+static void print_menu(int selected, const char *menu[], int menu_size) {
+    for (int i = 0; i < menu_size; i++) {
+        if (i == selected) {
+            printf(">> %s <<\n", menu[i]); // Highlight the selected option
+        } else {
+            printf("   %s\n", menu[i]);
+        }
+    }
+}

@@ -19,7 +19,7 @@
 #define LIGHT_YELLOW 14
 #define BRIGHT_WHITE 15
 
-// 색상을 지정하여 출력하는 함수 선언
-void colorPrintf(int textColor, int bgColor, const char *format, ...);
+void print_color(int textColor, int bgColor, const char *format, ...);
 
+int select_menu(const char *start_string, const char *menu[], int menu_size);
 #endif // COLOR_H

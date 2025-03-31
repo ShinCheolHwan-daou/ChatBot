@@ -4,6 +4,7 @@
 
 #include "asset.h"
 #include "../db/db.h"
+#include "../print/print.h"
 
 const char *asset_type_strings[] = {
     "현금자산",
@@ -22,45 +23,56 @@ void asset_print_asset() {
     if (stock_data != NULL) {
         for (int i = 0; i < asset_data[IDX_STOCK].data.stock.stock_count; i++) {
             if (stock_data[i].quantity > 0)
-            printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
-                stock_data[i].stock_name,
-                stock_data[i].quantity,
-                stock_data[i].total_price / stock_data[i].quantity,
-                stock_data[i].total_price);
+                printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
+                       stock_data[i].stock_name,
+                       stock_data[i].quantity,
+                       stock_data[i].total_price / stock_data[i].quantity,
+                       stock_data[i].total_price);
         }
     }
 
     free_asset(asset_data);
-    getchar();
     printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
     getchar();
 }
 
 void asset_save_asset() {
     Asset *asset_data = db_getUserAsset(g_user_data->user_id);
-    int choice;
 
-    printf("%s) 저장하실 파일 확장자를 선택해주세요!\n", g_chatbot_name);
-    printf("\t1.bin\n\t2.csv\n\t3.text\n\t4.취소\n>>");
-    scanf("%d", &choice);
-    switch (choice) {
-        case 1:
+
+    const char *menu[] = {
+        ".dat",
+        ".csv",
+        ".txt",
+        "취소"
+    };
+    int selected = 0; // Tracks the currently selected menu option
+    const int menu_size = sizeof(menu) / sizeof(menu[0]);
+    char start_string[100];
+    sprintf(start_string, "%s) 저장하실 파일 확장자를 선택해주세요!", g_chatbot_name);
+    selected = select_menu(start_string, menu, menu_size);
+
+    switch (selected) {
+        case 0:
             save_binary(asset_data);
             break;
-        case 2:
+        case 1:
             save_csv(asset_data);
             break;
-        case 3:
+        case 2:
             save_text(asset_data);
+            break;
+        case 3:
             break;
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
     }
 
     free_asset(asset_data);
-    getchar();
-    printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-    getchar();
+    if (selected != 3) {
+        printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+        getchar();
+    }
 }
 
 static void save_csv(Asset *asset) {
@@ -102,10 +114,10 @@ static void save_text(Asset *asset) {
     if (stock_data != NULL) {
         for (int i = 0; i < asset[IDX_STOCK].data.stock.stock_count; i++) {
             printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
-                stock_data[i].stock_name,
-                stock_data[i].quantity,
-                stock_data[i].current_price / stock_data[i].quantity,
-                stock_data[i].total_price);
+                   stock_data[i].stock_name,
+                   stock_data[i].quantity,
+                   stock_data[i].current_price / stock_data[i].quantity,
+                   stock_data[i].total_price);
         }
     }
     fclose(f);
@@ -113,42 +125,49 @@ static void save_text(Asset *asset) {
 }
 
 void asset_modify_asset_amount() {
-    int asset_kind;
-
-    printf("%s) 어떤 자산을 조정할까요?\n", g_chatbot_name);
-    printf("\t1.현금자산\n\t2.주식자산\n>>");
-    scanf("%d", &asset_kind);
-    switch (asset_kind) {
-        case 1:
+    const char *menu[] = {
+        "현금 자산",
+        "주식 자산",
+        "취소"
+    };
+    int selected = 0;
+    const int menu_size = sizeof(menu) / sizeof(menu[0]);
+    char start_string[100];
+    sprintf(start_string, "어떤 자산을 조정할까요?");
+    selected = select_menu(start_string, menu, menu_size);
+    switch (selected) {
+        case 0:
             modify_cash();
             break;
-        case 2:
+        case 1:
             modify_stock();
+            break;
+        case 2:
             break;
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
     }
-
-    getchar();
-    printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-    getchar();
 }
 
 static void modify_cash() {
-    int asset_method;
+    const char *menu[] = {
+        "입금",
+        "출금",
+        "취소"
+    };
+    int selected = 0;
+    const int menu_size = sizeof(menu) / sizeof(menu[0]);
+    char start_string[100];
+    sprintf(start_string, "%s) 현금자산을 어떻게 조정할까요?", g_chatbot_name);
+    selected = select_menu(start_string, menu, menu_size);
     double amount;
-
-    printf("%s) 현금자산을 어떻게 조정할까요?\n", g_chatbot_name);
-    printf("\t1.입금\n\t2.출금\n>>");
-    scanf("%d", &asset_method);
-    switch (asset_method) {
-        case 1:
-            asset_method = 1;
+    system("cls");
+    switch (selected) {
+        case 0:
             printf("%s) 입금할 금액을 알려주세요!\n>>", g_chatbot_name);
             scanf("%lf", &amount);
             break;
-        case 2:
-            asset_method = -1;
+        case 1:
             Asset *asset_data = db_getUserAsset(g_user_data->user_id);
             printf("%s) 출금할 금액을 알려주세요! (현재 잔액: %.2f원)\n>>", g_chatbot_name, asset_data[IDX_CASH].amount);
             scanf("%lf", &amount);
@@ -159,30 +178,45 @@ static void modify_cash() {
                 return;
             }
             free_asset(asset_data);
+            amount *= -1;
+            break;
+        case 2:
             break;
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
             return;
     }
-    Asset *asset_data = db_getUserAsset(g_user_data->user_id);
-    int cash_id = asset_data[IDX_CASH].asset_id;
-    free_asset(asset_data);
-    db_updateAsset(cash_id, amount * asset_method);
-    printf("%s) 현금자산 조정이 완료되었습니다!\n", g_chatbot_name);
+
+    fflush(stdin);
+    if (selected != 2) {
+        Asset *asset_data = db_getUserAsset(g_user_data->user_id);
+        int cash_id = asset_data[IDX_CASH].asset_id;
+        free_asset(asset_data);
+        db_updateAsset(cash_id, amount);
+        printf("%s) 현금자산 조정이 완료되었습니다!\n", g_chatbot_name);
+        printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+        getchar();
+    }
 }
 
 static void modify_stock() {
-    int asset_method;
     char stock_name[255];
     int quantity;
     double price;
+    const char *menu[] = {
+        "매수",
+        "매도",
+        "취소"
+    };
+    int selected = 0;
+    const int menu_size = sizeof(menu) / sizeof(menu[0]);
+    char start_string[100];
+    sprintf(start_string, "%s) 주식자산을 어떻게 조정할까요?", g_chatbot_name);
+    selected = select_menu(start_string, menu, menu_size);
 
-    printf("%s) 주식자산을 어떻게 조정할까요?\n", g_chatbot_name);
-    printf("\t1.매수\n\t2.매도\n>>");
-    scanf("%d", &asset_method);
-    switch (asset_method) {
-        case 1:
-            asset_method = 1;
+    system("cls");
+    switch (selected) {
+        case 0:
             printf("%s) 매수할 종목의 이름을 알려주세요!\n>>", g_chatbot_name);
             scanf("%s", stock_name);
             if (db_checkStockName(stock_name) == false) {
@@ -199,22 +233,19 @@ static void modify_stock() {
             printf("%s) 매수할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
             scanf("%lf", &price);
             break;
-        case 2:
-            asset_method = -1;
-
-        //================================================
+        case 1:
             Asset *asset_datas = db_getUserAsset(g_user_data->user_id);
             User_Stock *stock_data = asset_datas[IDX_STOCK].data.stock.user_stock;
             printf("%s) 현재 보유 주식은 다음과 같아요!\n", g_chatbot_name);
             if (stock_data != NULL) {
                 for (int i = 0; i < asset_datas[IDX_STOCK].data.stock.stock_count; i++) {
                     if (stock_data[i].quantity > 0)
-                    printf("\t%d) 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
-                        i + 1,
-                        stock_data[i].stock_name,
-                        stock_data[i].quantity,
-                        stock_data[i].total_price / stock_data[i].quantity,
-                        stock_data[i].total_price);
+                        printf("\t%d) 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
+                               i + 1,
+                               stock_data[i].stock_name,
+                               stock_data[i].quantity,
+                               stock_data[i].total_price / stock_data[i].quantity,
+                               stock_data[i].total_price);
                 }
             }
             free_asset(asset_datas);
@@ -228,8 +259,8 @@ static void modify_stock() {
             }
             User_Stock *asset_data = db_getUserStock(g_user_data->user_id, stock_name);
             printf("%s) 매도할 종목의 개수를 알려주세요! (현재 보유수: %d개)\n>>",
-                g_chatbot_name,
-                asset_data == NULL ? 0 : asset_data->quantity);
+                   g_chatbot_name,
+                   asset_data == NULL ? 0 : asset_data->quantity);
             scanf("%d", &quantity);
             if (quantity == 0) {
                 free(asset_data);
@@ -246,18 +277,28 @@ static void modify_stock() {
                 return;
             }
             price = asset_data->total_price / asset_data->quantity;
+            quantity *= -1;
             free(asset_data);
             break;
+        case 2:
+            break;
+
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
             return;
     }
-    Asset *asset_data = db_getUserAsset(g_user_data->user_id);
-    int stock_id = asset_data[IDX_STOCK].asset_id;
-    free_asset(asset_data);
-    db_updateAsset(stock_id, price * quantity * asset_method);
-    db_updateUserStock(g_user_data->user_id, stock_name, asset_method * quantity, quantity * asset_method * price);
-    printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+
+    fflush(stdin);
+    if (selected != 2) {
+        Asset *asset_data = db_getUserAsset(g_user_data->user_id);
+        int stock_id = asset_data[IDX_STOCK].asset_id;
+        free_asset(asset_data);
+        db_updateAsset(stock_id, price * quantity);
+        db_updateUserStock(g_user_data->user_id, stock_name, quantity, quantity * price);
+        printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+        printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+        getchar();
+    }
 }
 
 void free_asset(Asset *asset) {

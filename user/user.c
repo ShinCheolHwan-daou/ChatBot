@@ -7,7 +7,7 @@
 #include "user.h"
 
 #include "../chatbot/chatbot.h"
-#include "../color/color.h"
+#include "../print/print.h"
 #include "../file/file.h"
 #include "../db/db.h"
 
@@ -25,12 +25,51 @@ void user_print_ascii_art() {
         LIGHT_YELLOW,
         LIGHT_YELLOW
     };
-    colorPrintf(text_colors[0], BLACK, "██╗"); colorPrintf(LIGHT_PURPLE,BLACK, "  ██╗ ");colorPrintf(text_colors[1], BLACK, "██╗ ");colorPrintf(text_colors[2], BLACK, "██╗    ██╗ ");colorPrintf(text_colors[3], BLACK, " ██████╗  ");colorPrintf(text_colors[4], BLACK, " ██████╗  ");colorPrintf(text_colors[5], BLACK, "███╗   ███╗ ");colorPrintf(text_colors[6], BLACK, "███████╗\n");
-    colorPrintf(text_colors[0], BLACK, "██║"); colorPrintf(LIGHT_PURPLE,BLACK, " ██╔╝ ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "██║    ██║ ");colorPrintf(text_colors[3], BLACK, "██╔═══██╗ ");colorPrintf(text_colors[4], BLACK, "██╔═══██╗ ");colorPrintf(text_colors[5], BLACK, "████╗ ████║ ");colorPrintf(text_colors[6], BLACK, "██╔════╝\n");
-    colorPrintf(text_colors[0], BLACK, "███"); colorPrintf(LIGHT_PURPLE,BLACK, "██╔╝  ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "██║ █╗ ██║ ");colorPrintf(text_colors[3], BLACK, "██║   ██║ ");colorPrintf(text_colors[4], BLACK, "██║   ██║ ");colorPrintf(text_colors[5], BLACK, "██╔████╔██║ ");colorPrintf(text_colors[6], BLACK, "█████╗  \n");
-    colorPrintf(text_colors[0], BLACK, "██╔═██╗  ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "██║███╗██║ ");colorPrintf(text_colors[3], BLACK, "██║   ██║ ");colorPrintf(text_colors[4], BLACK, "██║   ██║ ");colorPrintf(text_colors[5], BLACK, "██║╚██╔╝██║ ");colorPrintf(text_colors[6], BLACK, "██╔══╝  \n");
-    colorPrintf(text_colors[0], BLACK, "██║  ██╗ ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "╚███╔███╔╝ ");colorPrintf(text_colors[3], BLACK, "╚██████╔╝ ");colorPrintf(text_colors[4], BLACK, "╚██████╔╝ ");colorPrintf(text_colors[5], BLACK, "██║ ╚═╝ ██║ ");colorPrintf(text_colors[6], BLACK, "███████╗\n");
-    colorPrintf(text_colors[0], BLACK, "╚═╝  ╚═╝ ");colorPrintf(text_colors[1], BLACK, "╚═╝ ");colorPrintf(text_colors[2], BLACK, " ╚══╝╚══╝  ");colorPrintf(text_colors[3], BLACK, " ╚═════╝  ");colorPrintf(text_colors[4], BLACK, " ╚═════╝  ");colorPrintf(text_colors[5], BLACK, "╚═╝     ╚═╝ ");colorPrintf(text_colors[6], BLACK, "╚══════╝\n");
+    print_color(text_colors[0], BLACK, "██╗");
+    print_color(LIGHT_PURPLE,BLACK, "  ██╗ ");
+    print_color(text_colors[1], BLACK, "██╗ ");
+    print_color(text_colors[2], BLACK, "██╗    ██╗ ");
+    print_color(text_colors[3], BLACK, " ██████╗  ");
+    print_color(text_colors[4], BLACK, " ██████╗  ");
+    print_color(text_colors[5], BLACK, "███╗   ███╗ ");
+    print_color(text_colors[6], BLACK, "███████╗\n");
+    print_color(text_colors[0], BLACK, "██║");
+    print_color(LIGHT_PURPLE,BLACK, " ██╔╝ ");
+    print_color(text_colors[1], BLACK, "██║ ");
+    print_color(text_colors[2], BLACK, "██║    ██║ ");
+    print_color(text_colors[3], BLACK, "██╔═══██╗ ");
+    print_color(text_colors[4], BLACK, "██╔═══██╗ ");
+    print_color(text_colors[5], BLACK, "████╗ ████║ ");
+    print_color(text_colors[6], BLACK, "██╔════╝\n");
+    print_color(text_colors[0], BLACK, "███");
+    print_color(LIGHT_PURPLE,BLACK, "██╔╝  ");
+    print_color(text_colors[1], BLACK, "██║ ");
+    print_color(text_colors[2], BLACK, "██║ █╗ ██║ ");
+    print_color(text_colors[3], BLACK, "██║   ██║ ");
+    print_color(text_colors[4], BLACK, "██║   ██║ ");
+    print_color(text_colors[5], BLACK, "██╔████╔██║ ");
+    print_color(text_colors[6], BLACK, "█████╗  \n");
+    print_color(text_colors[0], BLACK, "██╔═██╗  ");
+    print_color(text_colors[1], BLACK, "██║ ");
+    print_color(text_colors[2], BLACK, "██║███╗██║ ");
+    print_color(text_colors[3], BLACK, "██║   ██║ ");
+    print_color(text_colors[4], BLACK, "██║   ██║ ");
+    print_color(text_colors[5], BLACK, "██║╚██╔╝██║ ");
+    print_color(text_colors[6], BLACK, "██╔══╝  \n");
+    print_color(text_colors[0], BLACK, "██║  ██╗ ");
+    print_color(text_colors[1], BLACK, "██║ ");
+    print_color(text_colors[2], BLACK, "╚███╔███╔╝ ");
+    print_color(text_colors[3], BLACK, "╚██████╔╝ ");
+    print_color(text_colors[4], BLACK, "╚██████╔╝ ");
+    print_color(text_colors[5], BLACK, "██║ ╚═╝ ██║ ");
+    print_color(text_colors[6], BLACK, "███████╗\n");
+    print_color(text_colors[0], BLACK, "╚═╝  ╚═╝ ");
+    print_color(text_colors[1], BLACK, "╚═╝ ");
+    print_color(text_colors[2], BLACK, " ╚══╝╚══╝  ");
+    print_color(text_colors[3], BLACK, " ╚═════╝  ");
+    print_color(text_colors[4], BLACK, " ╚═════╝  ");
+    print_color(text_colors[5], BLACK, "╚═╝     ╚═╝ ");
+    print_color(text_colors[6], BLACK, "╚══════╝\n");
 }
 
 int user_login_page() {
@@ -59,6 +98,7 @@ int user_login_page() {
     char ch;
     while (life--) {
         char password[CHAR_LEN] = {0};
+        int i = 0;
         printf("%s) 비밀번호를 입력해주세요!\n>> ", g_chatbot_name);
         while (1) {
             ch = getch(); // 키 입력 받기 (화면에 표시되지 않음)
@@ -92,77 +132,49 @@ int user_login_page() {
     return LOGIN_FAILED;
 }
 
-// todo:: [지현] 워딩정리
-const char *menu[] = {
-    "📊 내 자산 한눈에 보기",
-    "💾 내 자산 저장하기",
-    "✏️ 내 자산 수정하기",
-    "💬 AI 챗봇과 대화하기",
-    "📚 AI 추천 가이드 저장하기",
-    "🚪 종료하기"
-};
-
-int selected_option = 0; // Tracks the currently selected menu option
-const int menu_size = sizeof(menu) / sizeof(menu[0]);
-
-void print_menu(int selected) {
-    system("cls"); // Clear the console screen
-    printf("\n=================<MENU>===============\n\n");
-    for (int i = 0; i < menu_size; i++) {
-        if (i == selected) {
-            printf(">> %s <<\n", menu[i]); // Highlight the selected option
-        } else {
-            printf("   %s\n", menu[i]);
-        }
-    }
-    printf("\n======================================\n");
-}
-
 int user_run_main_page() {
-    int key;
+    const char *menu[] = {
+        "📊 내 자산 한눈에 보기",
+        "💾 내 자산 저장하기",
+        "✏️ 내 자산 수정하기",
+        "💬 AI 챗봇과 대화하기",
+        "📚 AI 추천 가이드 저장하기",
+        "🚪 종료하기"
+    };
+
+    int selected = 0; // Tracks the currently selected menu option
+    const int menu_size = sizeof(menu) / sizeof(menu[0]);
     while (1) {
-        print_menu(selected_option);
-        printf("\n%s) 위/아래 방향키로 선택하고 Enter 키를 눌러 확인하세요.\n", g_chatbot_name);
+        selected = select_menu(NULL, menu, menu_size);
+        fflush(stdin);
 
-        key = _getch(); // Get keyboard input without requiring Enter
-
-        if (key == 224) {
-            // Arrow keys are preceded by 224 on Windows
-            key = _getch(); // Get the actual key code
-            if (key == 72) {
-                // Up arrow key
-                selected_option = (selected_option - 1 + menu_size) % menu_size;
-            } else if (key == 80) {
-                // Down arrow key
-                selected_option = (selected_option + 1) % menu_size;
-            }
-        } else if (key == 13) {
-            // Enter key
-            switch (selected_option) {
-                case 0:
-                    system("cls");
-                    asset_print_asset();
-                    break;
-                case 1:
-                    system("cls");
-                    asset_save_asset();
-                    break;
-                case 2:
-                    system("cls");
-                    asset_modify_asset_amount();
-                    break;
-                case 3:
-                    system("cls");
-                    chatbot_chat();
-                    break;
-                case 4:
-                    system("cls");
-                    file_export_json();
-                    break;
-                case 5:
-                    return MAIN_FINISHED;
-            }
+        // Enter key
+        switch (selected) {
+            case 0:
+                system("cls");
+                asset_print_asset();
+                break;
+            case 1:
+                system("cls");
+                asset_save_asset();
+                break;
+            case 2:
+                system("cls");
+                asset_modify_asset_amount();
+                break;
+            case 3:
+                system("cls");
+                chatbot_chat();
+                break;
+            case 4:
+                system("cls");
+                file_export_json();
+                break;
+            case 5:
+                return MAIN_FINISHED;
+            default:
+                printf("잘못된 선택지입니다.\n");
+                return MAIN_FINISHED;
         }
     }
-    return MAIN_WORKING;
 }
