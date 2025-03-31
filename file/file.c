@@ -96,6 +96,6 @@ void file_export_json() {
     printf("파일 저장에 성공했습니다.\n");
     print_color(BLUE, BLACK, "http://192.168.31.102:3000");
     printf("에서 결과보고서를 확인하세요!\n");
-    printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+    printf("\n(Enter를 눌러 계속...)\n");
     getchar();
 }
