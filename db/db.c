@@ -641,7 +641,7 @@ int db_updateAsset(int asset_id, double delta) { // 성공하면 0 반환해요
 }
 
 int db_updateUserStock(const char* user_id, const char* stock_name, int d_quantity, double d_totalprice) {
-    if (!user_id || !stock_name || d_quantity <= 0 || d_totalprice < 0) {
+    if (!user_id || !stock_name || !d_quantity || !d_totalprice) {
         fprintf(stderr, "[db_updateUserStock] Invalid parameters.\n");
         return -1;
     }
@@ -693,7 +693,7 @@ int db_updateUserStock(const char* user_id, const char* stock_name, int d_quanti
     status = OCIStmtFetch2(stmt_check, errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT);
 
     if (status == OCI_NO_DATA) {
-        printf("[db_updateUserStock] 보유 주식 없음 → 신규 추가\n");
+        // printf("[db_updateUserStock] 보유 주식 없음 → 신규 추가\n");
         OCIHandleFree(stmt_check, OCI_HTYPE_STMT);
         db_disconnect();
         return db_insertUserStock(user_id, stock_name, d_quantity, d_totalprice);
@@ -742,7 +742,7 @@ int db_updateUserStock(const char* user_id, const char* stock_name, int d_quanti
 }
 
 int db_insertUserStock(const char* user_id, const char* stock_name, int quantity, double total_price) {
-    printf("[db_insertUserStock] user_id=%s, stock_name=%s, quantity=%d, total_price=%.2f\n",user_id, stock_name, quantity, total_price);
+    // printf("[db_insertUserStock] user_id=%s, stock_name=%s, quantity=%d, total_price=%.2f\n",user_id, stock_name, quantity, total_price);
     if (!user_id || !stock_name || quantity <= 0 || total_price < 0) {
         fprintf(stderr, "[db_insertUserStock] Invalid input\n");
         return -1;
