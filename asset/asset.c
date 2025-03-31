@@ -76,7 +76,7 @@ void asset_print_asset() {
 
 
     free_asset(asset_data);
-    printf("\n(Enter를 눌러 계속...)\n");
+    print_enter();
     getchar();
 }
 
@@ -114,7 +114,7 @@ void asset_save_asset() {
 
     free_asset(asset_data);
     if (selected != 3) {
-        printf("\n(Enter를 눌러 계속...)\n");
+        print_enter();
         getchar();
     }
 }
@@ -220,7 +220,7 @@ static void modify_cash() {
             if (asset_data[IDX_CASH].amount < amount) {
                 printf("\n%s) 출금할 금액이 잔액보다 많아요!\n", g_chatbot_name);
                 printf("%s) 남은 현금 잔액: %.2f원\n", g_chatbot_name, asset_data[IDX_CASH].amount);
-                printf("\n(Enter를 눌러 계속...)\n");
+                print_enter();
                 clear_input_buffer();
                 getchar();
                 free_asset(asset_data);
@@ -233,7 +233,7 @@ static void modify_cash() {
             break;
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
-            printf("\n(Enter를 눌러 계속...)\n");
+            print_enter();
             clear_input_buffer();
             getchar();
             return;
@@ -246,7 +246,7 @@ static void modify_cash() {
         free_asset(asset_data);
         db_updateAsset(cash_id, amount);
         printf("\n%s) ✨현금자산 기록이 완료되었습니다!\n", g_chatbot_name);
-        printf("\n(Enter를 눌러 계속...)\n");
+        print_enter();
         getchar();
     }
 }
@@ -274,7 +274,7 @@ static void modify_stock() {
             if (db_checkStockName(stock_name) == false) {
                 printf("\n%s) %s 주식 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
                        g_chatbot_name, stock_name);
-                printf("\n(Enter를 눌러 계속...)\n");
+                print_enter();
                 clear_input_buffer();
                 getchar();
                 return;
@@ -283,7 +283,7 @@ static void modify_stock() {
             scanf("%d", &quantity);
             if (quantity == 0) {
                 printf("\n%s) ✨주식자산 기록이 완료되었습니다!\n", g_chatbot_name);
-                printf("\n(Enter를 눌러 계속...)\n");
+                print_enter();
                 clear_input_buffer();
                 getchar();
                 return;
@@ -313,7 +313,7 @@ static void modify_stock() {
             if (db_checkStockName(stock_name) == false) {
                 printf("%s) %s 주식 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
                        g_chatbot_name, stock_name);
-                printf("\n(Enter를 눌러 계속...)\n");
+                print_enter();
                 clear_input_buffer();
                 getchar();
                 return;
@@ -327,7 +327,7 @@ static void modify_stock() {
             if (quantity == 0) {
                 free(asset_data);
                 printf("\n%s) ✨주식자산 기록이 완료되었습니다!\n", g_chatbot_name);
-                printf("\n(Enter를 눌러 계속...)\n");
+                print_enter();
                 clear_input_buffer();
                 getchar();
                 return;
@@ -350,7 +350,7 @@ static void modify_stock() {
 
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
-            printf("\n(Enter를 눌러 계속...)\n");
+            print_enter();
             clear_input_buffer();
             getchar();
             return;
@@ -364,7 +364,7 @@ static void modify_stock() {
         db_updateAsset(stock_id, price * quantity);
         db_updateUserStock(g_user_data->user_id, stock_name, quantity, quantity * price);
         printf("\n%s) ✨주식자산 기록이 완료되었습니다!\n", g_chatbot_name);
-        printf("\n(Enter를 눌러 계속...)\n");
+        print_enter();
         getchar();
     }
 }

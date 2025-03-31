@@ -131,3 +131,7 @@ void clear_input_buffer() {
     int ch;
     while ((ch = getchar()) != '\n' && ch != EOF);
 }
+
+void print_enter() {
+    print_color(GRAY, BLACK, "\n(Enter를 눌러 계속...)\n");
+}

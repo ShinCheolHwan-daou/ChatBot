@@ -24,7 +24,7 @@ int user_login_page() {
     printf("\n%s)\t😊 안녕하세요! 저는 ai 챗봇 키우ME 입니다!\n", g_chatbot_name);
     printf("\t✅ 저는 고객님의 자산관리를 도와주며,\n");
     printf("\t✅ 다양한 주제에 대해 대답해 드리는 역할을 합니다.\n", g_chatbot_name);
-    printf("\n(Enter를 눌러 계속...)");
+    print_enter();
     getchar();
     print_clear();
 
@@ -70,7 +70,7 @@ int user_login_page() {
             getchar();
             printf("\n%s)\t✨ 환영합니다 %s 고객님!\n", g_chatbot_name, g_user_data->name);
             printf("\t키우ME 서비스를 시작합니다~\n");
-            printf("\n(Enter를 눌러 계속...)\n");
+            print_enter();
             getchar();
             return LOGIN_SUCCESS;
         } else {
@@ -79,7 +79,7 @@ int user_login_page() {
     }
     printf("%s)\t😭 비밀번호를 3회 이상 틀리셔서 접근이 차단되었습니다.\n", g_chatbot_name);
     getchar();
-    printf("\n(Enter를 눌러 나가기...)\n");
+    print_color(GRAY, BLACK, "\n(Enter를 눌러 나가기...)\n");
     getchar();
     return LOGIN_FAILED;
 }
