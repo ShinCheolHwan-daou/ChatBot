@@ -3,6 +3,7 @@
 //
 
 #include "asset.h"
+
 #include "../db/db.h"
 
 const char *asset_type_strings[] = {
@@ -11,24 +12,66 @@ const char *asset_type_strings[] = {
     //, "Crypto" // 추후
 };
 
+// 문자 폭 맞추기
+int get_display_width(const char* str) {
+    int width = 0;
+    while (*str) {
+        if ((*str & 0x80) != 0) { // 한글(UTF-8 기준)
+            width += 2;
+            str += 3; // UTF-8 한글 3바이트
+        } else {
+            width += 1;
+            str += 1;
+        }
+    }
+    return width;
+}
+
+// 너비에 맞춰 오른쪽 공백 추가
+void print_aligned_str(const char* str, int desired_width) {
+    int current_width = get_display_width(str);
+    printf("%s", str);
+    for (int i = current_width; i < desired_width; i++) {
+        printf(" ");
+    }
+}
+
 
 void asset_print_asset() {
     Asset *asset_data = db_getUserAsset(g_user_data->user_id);
-    printf("<<%s님의 자산 현황>>\n", g_user_data->name);
-    printf("[현금자산] 총 %.2f원\n", asset_data[IDX_CASH].amount);
-    printf("[주식자산] 총 %.2f원\n", asset_data[IDX_STOCK].amount);
+    printf("<<%s님의 자산 현황>>\n\n", g_user_data->name);
+    printf("[💵 현금자산] 총 %.2f원\n", asset_data[IDX_CASH].amount);
+    printf("[📈 주식자산] 총 %.2f원\n", asset_data[IDX_STOCK].amount);
+    printf("------------------------------\n");
+    printf("[📊 총 자산] 총 %.2f원\n", asset_data[IDX_CASH].amount+asset_data[IDX_STOCK].amount);
 
     User_Stock *stock_data = asset_data[IDX_STOCK].data.stock.user_stock;
+
     if (stock_data != NULL) {
-        for (int i = 0; i < asset_data[IDX_STOCK].data.stock.stock_count; i++) {
-            if (stock_data[i].quantity > 0)
-            printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
-                stock_data[i].stock_name,
-                stock_data[i].quantity,
-                stock_data[i].total_price / stock_data[i].quantity,
-                stock_data[i].total_price);
+        int total_stocks = asset_data[IDX_STOCK].data.stock.stock_count;
+
+        printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        printf("📑 보유 종목 정보 (총 %d건)\n", total_stocks);
+        printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        printf("|     종목명      | 보유량 |     평단가     |       총액       |\n");
+        printf("|-----------------|--------|----------------|------------------|\n");
+
+        for (int i = 0; i < total_stocks; i++) {
+            if (stock_data[i].quantity > 0) {
+                double avg_price = stock_data[i].total_price / stock_data[i].quantity;
+
+                printf("| ");
+                print_aligned_str(stock_data[i].stock_name, 16);  // 맞춤 폭 (16칸)
+                printf("| %6d | %12.2f원 | %14.2f원 |\n",
+                    stock_data[i].quantity,
+                    avg_price,
+                    stock_data[i].total_price);
+            }
         }
+
+        printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
     }
+
 
     free_asset(asset_data);
     getchar();
