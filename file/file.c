@@ -94,7 +94,7 @@ void file_export_json() {
     free(chats);
     cJSON_free(json);
 
-    printf("✨ 파일 저장에 성공했습니다.\n");
+    printf("✨ 파일 저장에 성공했습니다.\n\n");
     print_color(BLUE, BLACK, "http://192.168.31.102:3000");
     printf("에서 키우ME의 조언을 확인하세요!\n");
     print_enter();
