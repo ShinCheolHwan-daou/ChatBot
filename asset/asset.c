@@ -218,7 +218,7 @@ static void modify_cash() {
             printf("\n%s) 출금할 금액을 알려주세요! (현재 잔액: %.2f원)\n>>", g_chatbot_name, asset_data[IDX_CASH].amount);
             scanf("%lf", &amount);
             if (asset_data[IDX_CASH].amount < amount) {
-                printf("%s) 출금할 금액이 잔액보다 많아요!\n", g_chatbot_name);
+                printf("\n%s) 출금할 금액이 잔액보다 많아요!\n", g_chatbot_name);
                 printf("%s) 남은 현금 잔액: %.2f원\n", g_chatbot_name, asset_data[IDX_CASH].amount);
                 printf("\n(Enter를 눌러 계속...)\n");
                 clear_input_buffer();
@@ -245,7 +245,7 @@ static void modify_cash() {
         int cash_id = asset_data[IDX_CASH].asset_id;
         free_asset(asset_data);
         db_updateAsset(cash_id, amount);
-        printf("%s) 현금자산 조정이 완료되었습니다!\n", g_chatbot_name);
+        printf("\n%s) ✨현금자산 조정이 완료되었습니다!\n", g_chatbot_name);
         printf("\n(Enter를 눌러 계속...)\n");
         getchar();
     }
@@ -272,7 +272,7 @@ static void modify_stock() {
             printf("%s) 매수할 종목의 이름을 알려주세요!\n>>", g_chatbot_name);
             scanf("%s", stock_name);
             if (db_checkStockName(stock_name) == false) {
-                printf("%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
+                printf("\n%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
                        g_chatbot_name, stock_name);
                 printf("\n(Enter를 눌러 계속...)\n");
                 clear_input_buffer();
@@ -282,7 +282,7 @@ static void modify_stock() {
             printf("\n%s) 매수할 종목의 개수를 알려주세요!\n>>", g_chatbot_name);
             scanf("%d", &quantity);
             if (quantity == 0) {
-                printf("\n%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+                printf("\n%s) ✨주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
                 printf("\n(Enter를 눌러 계속...)\n");
                 clear_input_buffer();
                 getchar();
@@ -325,7 +325,7 @@ static void modify_stock() {
             scanf("%d", &quantity);
             if (quantity == 0) {
                 free(asset_data);
-                printf("\n%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+                printf("\n%s) ✨주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
                 printf("\n(Enter를 눌러 계속...)\n");
                 clear_input_buffer();
                 getchar();
@@ -362,7 +362,7 @@ static void modify_stock() {
         free_asset(asset_data);
         db_updateAsset(stock_id, price * quantity);
         db_updateUserStock(g_user_data->user_id, stock_name, quantity, quantity * price);
-        printf("\n%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+        printf("\n%s) ✨주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
         printf("\n(Enter를 눌러 계속...)\n");
         getchar();
     }
