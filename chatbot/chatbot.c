@@ -210,7 +210,7 @@ void chatbot_chat() {
         print_clear();
         print_color(GRAY, BLACK,"키우ME을 중단하려면 quit 또는 q를 입력하세요.\n");
         Message question = {"user"};
-        printf("\n질문을 입력해주세요: ");
+        printf("\n🔎 질문을 입력해주세요: ");
         if (fgets(question.content, sizeof(question.content), stdin) == NULL) {
             perror("Error reading input.\n");
             continue;
@@ -261,8 +261,9 @@ void chatbot_chat() {
     new_chat.content = messages_str;
 
     print_clear();
-    printf("제목: %s\n", new_chat.title);
-    printf("요약\n");
+    printf("💫 키우ME와의 대화 요약\n");
+    printf("\n[제목] %s\n", new_chat.title);
+    printf("\n[요약]\n");
     char *ptr = new_chat.summary;
     while (*ptr != '\0') {
         putchar(*ptr);
