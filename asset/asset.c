@@ -239,8 +239,8 @@ static void modify_cash() {
             return;
     }
 
-    clear_input_buffer();
     if (selected != 2) {
+        clear_input_buffer();
         Asset *asset_data = db_getUserAsset(g_user_data->user_id);
         int cash_id = asset_data[IDX_CASH].asset_id;
         free_asset(asset_data);
@@ -296,18 +296,31 @@ static void modify_stock() {
             User_Stock *stock_data = asset_datas[IDX_STOCK].data.stock.user_stock;
             printf("%s) 현재 보유 주식은 다음과 같아요!\n", g_chatbot_name);
             if (stock_data != NULL) {
-                for (int i = 0; i < asset_datas[IDX_STOCK].data.stock.stock_count; i++) {
-                    if (stock_data[i].quantity > 0)
-                        printf("\t%d) 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
-                               i + 1,
-                               stock_data[i].stock_name,
+                int total_stocks = asset_datas[IDX_STOCK].data.stock.stock_count;
+
+                printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+                printf("📑 보유 종목 정보 (총 %d건)\n", total_stocks);
+                printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+                printf("|     종목명      | 보유량 |     평단가     |       총액       |\n");
+                printf("|-----------------|--------|----------------|------------------|\n");
+
+                for (int i = 0; i < total_stocks; i++) {
+                    if (stock_data[i].quantity > 0) {
+                        double avg_price = stock_data[i].total_price / stock_data[i].quantity;
+
+                        printf("| ");
+                        print_aligned_str(stock_data[i].stock_name, 16); // 맞춤 폭 (16칸)
+                        printf("| %6d | %12.2f원 | %14.2f원 |\n",
                                stock_data[i].quantity,
-                               stock_data[i].total_price / stock_data[i].quantity,
+                               avg_price,
                                stock_data[i].total_price);
+                    }
                 }
+
+                printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
             }
             free_asset(asset_datas);
-        //================================================
+
             printf("\n%s) 매도하신 종목의 이름을 입력해주세요!\n>>", g_chatbot_name);
             scanf("%s", stock_name);
             if (db_checkStockName(stock_name) == false) {
@@ -321,7 +334,7 @@ static void modify_stock() {
             User_Stock *asset_data = db_getUserStock(g_user_data->user_id, stock_name);
             printf("\n%s) %s를 몇 주 매도하셨나요? (현재 보유수: %d개)\n>>",
                    g_chatbot_name,
-                     stock_name,
+                   stock_name,
                    asset_data == NULL ? 0 : asset_data->quantity);
             scanf("%d", &quantity);
             if (quantity == 0) {
@@ -356,8 +369,8 @@ static void modify_stock() {
             return;
     }
 
-    clear_input_buffer();
     if (selected != 2) {
+        clear_input_buffer();
         Asset *asset_data = db_getUserAsset(g_user_data->user_id);
         int stock_id = asset_data[IDX_STOCK].asset_id;
         free_asset(asset_data);
