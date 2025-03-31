@@ -426,7 +426,7 @@ User_Stock* db_getUserStockList(const char *user_id, int *outCount)
     const char *sql_user_stocks =
         "SELECT us.USER_STOCK_ID, us.STOCK_ID, s.NAME, us.QUANTITY, us.TOTAL_PRICE, s.PRICE "
         "FROM USER_STOCK us, STOCK s "
-        "WHERE us.USER_ID = :1 AND us.STOCK_ID = s.STOCK_ID";
+        "WHERE us.USER_ID = :1 AND us.STOCK_ID = s.STOCK_ID AND us.QUANTITY > 0";
 
     OCIHandleAlloc(envhp, (dvoid**)&stmt, OCI_HTYPE_STMT, 0, NULL);
 
