@@ -21,6 +21,7 @@ void asset_print_asset() {
     User_Stock *stock_data = asset_data[IDX_STOCK].data.stock.user_stock;
     if (stock_data != NULL) {
         for (int i = 0; i < asset_data[IDX_STOCK].data.stock.stock_count; i++) {
+            if (stock_data[i].quantity > 0)
             printf("- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
                 stock_data[i].stock_name,
                 stock_data[i].quantity,
@@ -40,7 +41,7 @@ void asset_save_asset() {
     int choice;
 
     printf("%s) 저장하실 파일 확장자를 선택해주세요!\n", g_chatbot_name);
-    printf("\t1.bin\n\t2.csv\n\t3.text\n>>");
+    printf("\t1.bin\n\t2.csv\n\t3.text\n\t4.취소\n>>");
     scanf("%d", &choice);
     switch (choice) {
         case 1:
@@ -203,6 +204,7 @@ static void modify_stock() {
             printf("%s) 현재 보유 주식은 다음과 같아요!\n", g_chatbot_name);
             if (stock_data != NULL) {
                 for (int i = 0; i < asset_datas[IDX_STOCK].data.stock.stock_count; i++) {
+                    if (stock_data[i].quantity > 0)
                     printf("\t%d) 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
                         i + 1,
                         stock_data[i].stock_name,
@@ -234,8 +236,7 @@ static void modify_stock() {
                 free(asset_data);
                 return;
             }
-            printf("%s) 매도할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
-            scanf("%lf", &price);
+            price = asset_data->total_price / asset_data->quantity;
             free(asset_data);
             break;
         default:
