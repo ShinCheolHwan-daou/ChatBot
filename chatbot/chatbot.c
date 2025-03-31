@@ -268,4 +268,5 @@ void chatbot_chat() {
     free(messages_str);
     free(messages);
     printf("채팅을 종료합니다.\n");
+    getchar();
 }
