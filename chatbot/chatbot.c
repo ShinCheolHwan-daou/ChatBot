@@ -1,6 +1,7 @@
 #include "chatbot.h"
 #include "../user/user.h"
 #include "../db/db.h"
+#include "../print/print.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -170,7 +171,6 @@ static Message chatbot_chat_completions(const Message *messages, int message_len
 }
 
 void chatbot_chat() {
-    getchar();
     if (g_user_data == NULL) {
         perror("Need user data.\n");
         return;
@@ -210,7 +210,7 @@ void chatbot_chat() {
 
 
     while (true) {
-        fflush(stdin);
+        clear_input_buffer();
         Message question = {"user"};
         printf("\n질문을 입력해주세요: ");
         if (fgets(question.content, sizeof(question.content), stdin) == NULL) {

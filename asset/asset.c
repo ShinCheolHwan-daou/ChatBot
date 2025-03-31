@@ -39,6 +39,7 @@ void print_aligned_str(const char *str, int desired_width) {
 
 
 void asset_print_asset() {
+    print_clear();
     Asset *asset_data = db_getUserAsset(g_user_data->user_id);
     printf("<<%s님의 자산 현황>>\n\n", g_user_data->name);
     printf("[💵 현금자산] 총 %.2f원\n", asset_data[IDX_CASH].amount);
@@ -220,7 +221,7 @@ static void modify_cash() {
                 printf("%s) 출금할 금액이 잔액보다 많아요!\n", g_chatbot_name);
                 printf("%s) 남은 현금 잔액: %.2f원\n", g_chatbot_name, asset_data[IDX_CASH].amount);
                 printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-                fflush(stdin);
+                clear_input_buffer();
                 getchar();
                 free_asset(asset_data);
                 return;
@@ -233,12 +234,12 @@ static void modify_cash() {
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
             printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-            fflush(stdin);
+            clear_input_buffer();
             getchar();
             return;
     }
 
-    fflush(stdin);
+    clear_input_buffer();
     if (selected != 2) {
         Asset *asset_data = db_getUserAsset(g_user_data->user_id);
         int cash_id = asset_data[IDX_CASH].asset_id;
@@ -274,7 +275,7 @@ static void modify_stock() {
                 printf("%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
                        g_chatbot_name, stock_name);
                 printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-                fflush(stdin);
+                clear_input_buffer();
                 getchar();
                 return;
             }
@@ -283,7 +284,7 @@ static void modify_stock() {
             if (quantity == 0) {
                 printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
                 printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-                fflush(stdin);
+                clear_input_buffer();
                 getchar();
                 return;
             }
@@ -313,7 +314,7 @@ static void modify_stock() {
                 printf("%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
                        g_chatbot_name, stock_name);
                 printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-                fflush(stdin);
+                clear_input_buffer();
                 getchar();
                 return;
             }
@@ -326,7 +327,7 @@ static void modify_stock() {
                 free(asset_data);
                 printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
                 printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-                fflush(stdin);
+                clear_input_buffer();
                 getchar();
                 return;
             }
@@ -349,12 +350,12 @@ static void modify_stock() {
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
             printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
-            fflush(stdin);
+            clear_input_buffer();
             getchar();
             return;
     }
 
-    fflush(stdin);
+    clear_input_buffer();
     if (selected != 2) {
         Asset *asset_data = db_getUserAsset(g_user_data->user_id);
         int stock_id = asset_data[IDX_STOCK].asset_id;

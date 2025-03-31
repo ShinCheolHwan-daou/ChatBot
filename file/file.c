@@ -11,6 +11,7 @@
 #include "../print/print.h"
 
 void file_export_json() {
+    print_clear();
     Asset *assets = db_getUserAsset(g_user_data->user_id);
     int chat_count = 0;
     Chat *chats = db_getUserChats(g_user_data->user_id, &chat_count);

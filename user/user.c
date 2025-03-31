@@ -98,28 +98,22 @@ int user_run_main_page() {
     const int menu_size = sizeof(menu) / sizeof(menu[0]);
     while (1) {
         selected = select_menu(NULL, menu, menu_size);
-        fflush(stdin);
 
         // Enter key
         switch (selected) {
             case 0:
-                print_clear();
                 asset_print_asset();
                 break;
             case 1:
-                print_clear();
                 asset_save_asset();
                 break;
             case 2:
-                print_clear();
                 asset_modify_asset_amount();
                 break;
             case 3:
-                print_clear();
                 chatbot_chat();
                 break;
             case 4:
-                print_clear();
                 file_export_json();
                 break;
             case 5:
