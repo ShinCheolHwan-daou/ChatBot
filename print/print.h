@@ -24,4 +24,6 @@ void print_color(int textColor, int bgColor, const char *format, ...);
 int select_menu(const char *start_string, const char *menu[], int menu_size);
 
 void print_clear();
+
+void clear_input_buffer();
 #endif // COLOR_H

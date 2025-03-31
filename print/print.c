@@ -125,3 +125,9 @@ static void user_print_ascii_art() {
     print_color(text_colors[5], BLACK, "╚═╝     ╚═╝ ");
     print_color(text_colors[6], BLACK, "╚══════╝\n\n");
 }
+
+
+void clear_input_buffer() {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+}
