@@ -171,6 +171,7 @@ static Message chatbot_chat_completions(const Message *messages, int message_len
 }
 
 void chatbot_chat() {
+    // clear_input_buffer();
     if (g_user_data == NULL) {
         perror("Need user data.\n");
         return;
@@ -181,9 +182,6 @@ void chatbot_chat() {
         perror("Failed to get PERPLEXITY_API_KEY.\n");
         return;
     }
-
-    printf("%s님 반갑습니다!\n", g_user_data->name);
-    printf("챗봇을 중단하려면 quit 또는 q를 입력하세요.\n");
 
     int message_length = 0;
     Message *messages = malloc(sizeof(Message) * 128);
@@ -208,9 +206,9 @@ void chatbot_chat() {
         message_length++;
     }
 
-
     while (true) {
-        clear_input_buffer();
+        print_clear();
+        print_color(GRAY, BLACK,"키우ME을 중단하려면 quit 또는 q를 입력하세요.\n");
         Message question = {"user"};
         printf("\n질문을 입력해주세요: ");
         if (fgets(question.content, sizeof(question.content), stdin) == NULL) {
@@ -231,6 +229,8 @@ void chatbot_chat() {
         Message answer = chatbot_chat_completions(messages, message_length);
         add_message(messages, &message_length, answer);
         printf("\n%s\n", answer.content);
+        print_enter();
+        clear_input_buffer();
     }
 
     // 질문을 안했을 경우, return
@@ -260,13 +260,23 @@ void chatbot_chat() {
     new_chat.summary = summary.content;
     new_chat.content = messages_str;
 
+    print_clear();
     printf("제목: %s\n", new_chat.title);
-    printf("요약: %s\n", new_chat.summary);
+    printf("요약\n");
+    char *ptr = new_chat.summary;
+    while (*ptr != '\0') {
+        putchar(*ptr);
+        if (*ptr == '.') {
+            putchar('\n');
+            ptr++;
+        }
+        ptr++;
+    }
 
     db_insertUserChat(new_chat);
 
     free(messages_str);
     free(messages);
-    printf("채팅을 종료합니다.\n");
+    print_enter();
     getchar();
 }

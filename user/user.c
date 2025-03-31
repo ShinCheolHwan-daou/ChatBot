@@ -12,7 +12,7 @@
 #include "../db/db.h"
 
 
-char g_chatbot_name[20] = "키우Me";
+char g_chatbot_name[20] = "키우ME";
 User *g_user_data = NULL;
 
 

@@ -8,6 +8,7 @@
 
 
 static void print_menu(int selected, const char *menu[], int menu_size);
+
 static void user_print_ascii_art();
 
 void setColor(int text, int background) {
@@ -35,7 +36,8 @@ int select_menu(const char *start_str, const char *menu[], int menu_size) {
             printf("%s\n\n", start_str);
         }
         print_menu(selected_option, menu, menu_size);
-        printf("\n위/아래 방향키로 선택하고 Enter 키를 눌러 확인하세요.\n");
+
+        print_color(GRAY, BLACK, "\n위/아래 방향키로 선택하고 Enter 키를 눌러 확인하세요.\n");
         key = _getch();
 
         if (key == 224) {
