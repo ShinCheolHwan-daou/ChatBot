@@ -549,7 +549,7 @@ User_Stock* db_getUserStock(const char *user_id, const char *stock_name) {
     sword status = OCIStmtFetch2(stmt, errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT);
 
     if (status == OCI_NO_DATA) {
-        printf("[db_getUserStock] No stock found for user_id='%s', stock_name='%s'\n", user_id, stock_name);
+        // printf("[db_getUserStock] No stock found for user_id='%s', stock_name='%s'\n", user_id, stock_name);
     } else if (status != OCI_SUCCESS && status != OCI_SUCCESS_WITH_INFO) {
         printf("[db_getUserStock] OCIStmtFetch2 failed.\n");
         check_error(errhp);
