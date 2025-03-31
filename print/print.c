@@ -3,11 +3,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include <conio.h> // For _getch() on Windows
-#include <windows.h> // For system("cls") on Windows
+#include <conio.h>
+#include <windows.h>
 
 
 static void print_menu(int selected, const char *menu[], int menu_size);
+static void user_print_ascii_art();
 
 void setColor(int text, int background) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), background * 16 + text);
@@ -29,7 +30,7 @@ int select_menu(const char *start_str, const char *menu[], int menu_size) {
     int key;
 
     while (true) {
-        system("cls"); // Clear the console screen
+        print_clear();
         if (start_str != NULL) {
             printf("%s\n\n", start_str);
         }
@@ -61,4 +62,66 @@ static void print_menu(int selected, const char *menu[], int menu_size) {
             printf("   %s\n", menu[i]);
         }
     }
+}
+
+void print_clear() {
+    system("cls");
+    user_print_ascii_art();
+}
+
+static void user_print_ascii_art() {
+    int text_colors[] = {
+        WHITE,
+        LIGHT_BLUE,
+        LIGHT_BLUE,
+        LIGHT_BLUE,
+        LIGHT_BLUE,
+        LIGHT_YELLOW,
+        LIGHT_YELLOW
+    };
+    print_color(text_colors[0], BLACK, "██╗");
+    print_color(LIGHT_PURPLE,BLACK, "  ██╗ ");
+    print_color(text_colors[1], BLACK, "██╗ ");
+    print_color(text_colors[2], BLACK, "██╗    ██╗ ");
+    print_color(text_colors[3], BLACK, " ██████╗  ");
+    print_color(text_colors[4], BLACK, " ██████╗  ");
+    print_color(text_colors[5], BLACK, "███╗   ███╗ ");
+    print_color(text_colors[6], BLACK, "███████╗\n");
+    print_color(text_colors[0], BLACK, "██║");
+    print_color(LIGHT_PURPLE,BLACK, " ██╔╝ ");
+    print_color(text_colors[1], BLACK, "██║ ");
+    print_color(text_colors[2], BLACK, "██║    ██║ ");
+    print_color(text_colors[3], BLACK, "██╔═══██╗ ");
+    print_color(text_colors[4], BLACK, "██╔═══██╗ ");
+    print_color(text_colors[5], BLACK, "████╗ ████║ ");
+    print_color(text_colors[6], BLACK, "██╔════╝\n");
+    print_color(text_colors[0], BLACK, "███");
+    print_color(LIGHT_PURPLE,BLACK, "██╔╝  ");
+    print_color(text_colors[1], BLACK, "██║ ");
+    print_color(text_colors[2], BLACK, "██║ █╗ ██║ ");
+    print_color(text_colors[3], BLACK, "██║   ██║ ");
+    print_color(text_colors[4], BLACK, "██║   ██║ ");
+    print_color(text_colors[5], BLACK, "██╔████╔██║ ");
+    print_color(text_colors[6], BLACK, "█████╗  \n");
+    print_color(text_colors[0], BLACK, "██╔═██╗  ");
+    print_color(text_colors[1], BLACK, "██║ ");
+    print_color(text_colors[2], BLACK, "██║███╗██║ ");
+    print_color(text_colors[3], BLACK, "██║   ██║ ");
+    print_color(text_colors[4], BLACK, "██║   ██║ ");
+    print_color(text_colors[5], BLACK, "██║╚██╔╝██║ ");
+    print_color(text_colors[6], BLACK, "██╔══╝  \n");
+    print_color(text_colors[0], BLACK, "██║  ██╗ ");
+    print_color(text_colors[1], BLACK, "██║ ");
+    print_color(text_colors[2], BLACK, "╚███╔███╔╝ ");
+    print_color(text_colors[3], BLACK, "╚██████╔╝ ");
+    print_color(text_colors[4], BLACK, "╚██████╔╝ ");
+    print_color(text_colors[5], BLACK, "██║ ╚═╝ ██║ ");
+    print_color(text_colors[6], BLACK, "███████╗\n");
+    print_color(text_colors[0], BLACK, "╚═╝  ╚═╝ ");
+    print_color(text_colors[1], BLACK, "╚═╝ ");
+    print_color(text_colors[2], BLACK, " ╚══╝╚══╝  ");
+    print_color(text_colors[3], BLACK, " ╚═════╝  ");
+    print_color(text_colors[4], BLACK, " ╚═════╝  ");
+    print_color(text_colors[5], BLACK, "╚═╝     ╚═╝ ");
+    print_color(text_colors[6], BLACK, "╚══════╝\n\n");
 }

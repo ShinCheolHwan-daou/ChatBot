@@ -1,8 +1,8 @@
 //
 // Created by daou__jaejin on 2025-03-25.
 //
-#include <conio.h> // For _getch() on Windows
-#include <windows.h> // For system("cls") on Windows
+#include <conio.h>
+#include <windows.h>
 
 #include "user.h"
 
@@ -15,78 +15,18 @@
 char g_chatbot_name[20] = "키우Me";
 User *g_user_data = NULL;
 
-void user_print_ascii_art() {
-    int text_colors[] = {
-        WHITE,
-        LIGHT_BLUE,
-        LIGHT_BLUE,
-        LIGHT_BLUE,
-        LIGHT_BLUE,
-        LIGHT_YELLOW,
-        LIGHT_YELLOW
-    };
-    print_color(text_colors[0], BLACK, "██╗");
-    print_color(LIGHT_PURPLE,BLACK, "  ██╗ ");
-    print_color(text_colors[1], BLACK, "██╗ ");
-    print_color(text_colors[2], BLACK, "██╗    ██╗ ");
-    print_color(text_colors[3], BLACK, " ██████╗  ");
-    print_color(text_colors[4], BLACK, " ██████╗  ");
-    print_color(text_colors[5], BLACK, "███╗   ███╗ ");
-    print_color(text_colors[6], BLACK, "███████╗\n");
-    print_color(text_colors[0], BLACK, "██║");
-    print_color(LIGHT_PURPLE,BLACK, " ██╔╝ ");
-    print_color(text_colors[1], BLACK, "██║ ");
-    print_color(text_colors[2], BLACK, "██║    ██║ ");
-    print_color(text_colors[3], BLACK, "██╔═══██╗ ");
-    print_color(text_colors[4], BLACK, "██╔═══██╗ ");
-    print_color(text_colors[5], BLACK, "████╗ ████║ ");
-    print_color(text_colors[6], BLACK, "██╔════╝\n");
-    print_color(text_colors[0], BLACK, "███");
-    print_color(LIGHT_PURPLE,BLACK, "██╔╝  ");
-    print_color(text_colors[1], BLACK, "██║ ");
-    print_color(text_colors[2], BLACK, "██║ █╗ ██║ ");
-    print_color(text_colors[3], BLACK, "██║   ██║ ");
-    print_color(text_colors[4], BLACK, "██║   ██║ ");
-    print_color(text_colors[5], BLACK, "██╔████╔██║ ");
-    print_color(text_colors[6], BLACK, "█████╗  \n");
-    print_color(text_colors[0], BLACK, "██╔═██╗  ");
-    print_color(text_colors[1], BLACK, "██║ ");
-    print_color(text_colors[2], BLACK, "██║███╗██║ ");
-    print_color(text_colors[3], BLACK, "██║   ██║ ");
-    print_color(text_colors[4], BLACK, "██║   ██║ ");
-    print_color(text_colors[5], BLACK, "██║╚██╔╝██║ ");
-    print_color(text_colors[6], BLACK, "██╔══╝  \n");
-    print_color(text_colors[0], BLACK, "██║  ██╗ ");
-    print_color(text_colors[1], BLACK, "██║ ");
-    print_color(text_colors[2], BLACK, "╚███╔███╔╝ ");
-    print_color(text_colors[3], BLACK, "╚██████╔╝ ");
-    print_color(text_colors[4], BLACK, "╚██████╔╝ ");
-    print_color(text_colors[5], BLACK, "██║ ╚═╝ ██║ ");
-    print_color(text_colors[6], BLACK, "███████╗\n");
-    print_color(text_colors[0], BLACK, "╚═╝  ╚═╝ ");
-    print_color(text_colors[1], BLACK, "╚═╝ ");
-    print_color(text_colors[2], BLACK, " ╚══╝╚══╝  ");
-    print_color(text_colors[3], BLACK, " ╚═════╝  ");
-    print_color(text_colors[4], BLACK, " ╚═════╝  ");
-    print_color(text_colors[5], BLACK, "╚═╝     ╚═╝ ");
-    print_color(text_colors[6], BLACK, "╚══════╝\n");
-}
 
 int user_login_page() {
     char user_id[CHAR_LEN];
 
-    user_print_ascii_art();
-    // todo:: [재진] 사용설명
-    // printf("\n============================================\n");
-    // printf("🔐 DAOU 자산관리 시스템에 오신 것을 환영합니다.\n");
-    // printf("============================================\n");
+    print_clear();
 
     printf("\n%s)\t😊 안녕하세요! 저는 ai 챗봇 키우ME 입니다!\n", g_chatbot_name);
     printf("\t✅ 저는 고객님의 자산관리를 도와주며,\n");
     printf("\t✅ 다양한 주제에 대해 대답해 드리는 역할을 합니다.\n", g_chatbot_name);
     printf("\n(Enter를 눌러 계속...)");
     getchar();
-    system("cls"); // Clear the console screen
+    print_clear();
 
     printf("%s)\t 고객님의 ID를 입력해주세요!\n>> ", g_chatbot_name);
     while (1) {
@@ -163,23 +103,23 @@ int user_run_main_page() {
         // Enter key
         switch (selected) {
             case 0:
-                system("cls");
+                print_clear();
                 asset_print_asset();
                 break;
             case 1:
-                system("cls");
+                print_clear();
                 asset_save_asset();
                 break;
             case 2:
-                system("cls");
+                print_clear();
                 asset_modify_asset_amount();
                 break;
             case 3:
-                system("cls");
+                print_clear();
                 chatbot_chat();
                 break;
             case 4:
-                system("cls");
+                print_clear();
                 file_export_json();
                 break;
             case 5:

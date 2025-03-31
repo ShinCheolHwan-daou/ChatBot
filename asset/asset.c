@@ -204,7 +204,7 @@ static void modify_cash() {
     sprintf(start_string, "%s) 현금자산을 어떻게 조정할까요?", g_chatbot_name);
     selected = select_menu(start_string, menu, menu_size);
     double amount;
-    system("cls");
+    print_clear();
     switch (selected) {
         case 0:
             printf("%s) 입금할 금액을 알려주세요!\n>>", g_chatbot_name);
@@ -218,6 +218,7 @@ static void modify_cash() {
                 printf("%s) 출금할 금액이 잔액보다 많아요!\n", g_chatbot_name);
                 printf("%s) 남은 현금 잔액: %.2f원\n", g_chatbot_name, asset_data[IDX_CASH].amount);
                 printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+                fflush(stdin);
                 getchar();
                 free_asset(asset_data);
                 return;
@@ -230,6 +231,7 @@ static void modify_cash() {
         default:
             printf("%s) 유효한 선택이 아닙니다.\n", g_chatbot_name);
             printf("%s) Enter 키를 눌러 계속 진행하세요...\n", g_chatbot_name);
+            fflush(stdin);
             getchar();
             return;
     }
@@ -261,7 +263,7 @@ static void modify_stock() {
     sprintf(start_string, "%s) 주식자산을 어떻게 조정할까요?", g_chatbot_name);
     selected = select_menu(start_string, menu, menu_size);
 
-    system("cls");
+    print_clear();
     switch (selected) {
         case 0:
             printf("%s) 매수할 종목의 이름을 알려주세요!\n>>", g_chatbot_name);
