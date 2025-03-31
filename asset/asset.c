@@ -214,7 +214,7 @@ static void modify_cash() {
             break;
         case 1:
             Asset *asset_data = db_getUserAsset(g_user_data->user_id);
-            printf("%s) 출금할 금액을 알려주세요! (현재 잔액: %.2f원)\n>>", g_chatbot_name, asset_data[IDX_CASH].amount);
+            printf("\n%s) 출금할 금액을 알려주세요! (현재 잔액: %.2f원)\n>>", g_chatbot_name, asset_data[IDX_CASH].amount);
             scanf("%lf", &amount);
             if (asset_data[IDX_CASH].amount < amount) {
                 printf("%s) 출금할 금액이 잔액보다 많아요!\n", g_chatbot_name);
@@ -278,16 +278,16 @@ static void modify_stock() {
                 getchar();
                 return;
             }
-            printf("%s) 매수할 종목의 개수를 알려주세요!\n>>", g_chatbot_name);
+            printf("\n%s) 매수할 종목의 개수를 알려주세요!\n>>", g_chatbot_name);
             scanf("%d", &quantity);
             if (quantity == 0) {
-                printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+                printf("\n%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
                 printf("\n(Enter를 눌러 계속...)\n");
                 fflush(stdin);
                 getchar();
                 return;
             }
-            printf("%s) 매수할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
+            printf("\n%s) 매수할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
             scanf("%lf", &price);
             break;
         case 1:
@@ -318,20 +318,20 @@ static void modify_stock() {
                 return;
             }
             User_Stock *asset_data = db_getUserStock(g_user_data->user_id, stock_name);
-            printf("%s) 매도할 종목의 개수를 알려주세요! (현재 보유수: %d개)\n>>",
+            printf("\n%s) 매도할 종목의 개수를 알려주세요! (현재 보유수: %d개)\n>>",
                    g_chatbot_name,
                    asset_data == NULL ? 0 : asset_data->quantity);
             scanf("%d", &quantity);
             if (quantity == 0) {
                 free(asset_data);
-                printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+                printf("\n%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
                 printf("\n(Enter를 눌러 계속...)\n");
                 fflush(stdin);
                 getchar();
                 return;
             }
             if (asset_data == NULL || asset_data->quantity < quantity) {
-                printf("%s) 매도할 보유주식이 적어요!\n", g_chatbot_name);
+                printf("\n%s) 매도할 보유주식이 적어요!\n", g_chatbot_name);
                 printf("%s) 현재 %s 보유주식: %d개\n",
                        g_chatbot_name,
                        stock_name,
@@ -361,7 +361,7 @@ static void modify_stock() {
         free_asset(asset_data);
         db_updateAsset(stock_id, price * quantity);
         db_updateUserStock(g_user_data->user_id, stock_name, quantity, quantity * price);
-        printf("%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+        printf("\n%s) 주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
         printf("\n(Enter를 눌러 계속...)\n");
         getchar();
     }
