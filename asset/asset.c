@@ -172,14 +172,14 @@ static void save_text(Asset *asset) {
 
 void asset_modify_asset_amount() {
     const char *menu[] = {
-        "현금 자산",
-        "주식 자산",
+        "💵 현금 자산",
+        "📈 주식 자산",
         "취소"
     };
     int selected = 0;
     const int menu_size = sizeof(menu) / sizeof(menu[0]);
     char start_string[100];
-    sprintf(start_string, "어떤 자산을 조정할까요?");
+    sprintf(start_string, "어떤 자산을 기록할까요?");
     selected = select_menu(start_string, menu, menu_size);
     switch (selected) {
         case 0:
@@ -197,25 +197,25 @@ void asset_modify_asset_amount() {
 
 static void modify_cash() {
     const char *menu[] = {
-        "입금",
-        "출금",
+        "현금이 늘었어요 (증가)",
+        "현금이 줄었어요 (감소)",
         "취소"
     };
     int selected = 0;
     const int menu_size = sizeof(menu) / sizeof(menu[0]);
     char start_string[100];
-    sprintf(start_string, "%s) 현금자산을 어떻게 조정할까요?", g_chatbot_name);
+    sprintf(start_string, "%s) 현금자산을 어떻게 기록할까요?", g_chatbot_name);
     selected = select_menu(start_string, menu, menu_size);
     double amount;
     print_clear();
     switch (selected) {
         case 0:
-            printf("%s) 입금할 금액을 알려주세요!\n>>", g_chatbot_name);
+            printf("%s) 현금이 얼마나 늘었나요?\n>>", g_chatbot_name);
             scanf("%lf", &amount);
             break;
         case 1:
             Asset *asset_data = db_getUserAsset(g_user_data->user_id);
-            printf("\n%s) 출금할 금액을 알려주세요! (현재 잔액: %.2f원)\n>>", g_chatbot_name, asset_data[IDX_CASH].amount);
+            printf("\n%s) 현금이 얼마나 줄었나요? (현재 잔액: %.2f원)\n>>", g_chatbot_name, asset_data[IDX_CASH].amount);
             scanf("%lf", &amount);
             if (asset_data[IDX_CASH].amount < amount) {
                 printf("\n%s) 출금할 금액이 잔액보다 많아요!\n", g_chatbot_name);
@@ -245,7 +245,7 @@ static void modify_cash() {
         int cash_id = asset_data[IDX_CASH].asset_id;
         free_asset(asset_data);
         db_updateAsset(cash_id, amount);
-        printf("\n%s) ✨현금자산 조정이 완료되었습니다!\n", g_chatbot_name);
+        printf("\n%s) ✨현금자산 기록이 완료되었습니다!\n", g_chatbot_name);
         printf("\n(Enter를 눌러 계속...)\n");
         getchar();
     }
@@ -256,39 +256,39 @@ static void modify_stock() {
     int quantity;
     double price;
     const char *menu[] = {
-        "매수",
-        "매도",
+        "주식을 샀어요!",
+        "주식을 팔았어요!",
         "취소"
     };
     int selected = 0;
     const int menu_size = sizeof(menu) / sizeof(menu[0]);
     char start_string[100];
-    sprintf(start_string, "%s) 주식자산을 어떻게 조정할까요?", g_chatbot_name);
+    sprintf(start_string, "%s) 주식자산을 어떻게 기록할까요?", g_chatbot_name);
     selected = select_menu(start_string, menu, menu_size);
 
     print_clear();
     switch (selected) {
         case 0:
-            printf("%s) 매수할 종목의 이름을 알려주세요!\n>>", g_chatbot_name);
+            printf("%s) 어떤 주식을 매수하셨나요? (종목명 입력)\n>>", g_chatbot_name);
             scanf("%s", stock_name);
             if (db_checkStockName(stock_name) == false) {
-                printf("\n%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
+                printf("\n%s) %s 주식 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
                        g_chatbot_name, stock_name);
                 printf("\n(Enter를 눌러 계속...)\n");
                 clear_input_buffer();
                 getchar();
                 return;
             }
-            printf("\n%s) 매수할 종목의 개수를 알려주세요!\n>>", g_chatbot_name);
+            printf("\n%s) %s를 몇 주 매수하셨나요?\n>>", g_chatbot_name, stock_name);
             scanf("%d", &quantity);
             if (quantity == 0) {
-                printf("\n%s) ✨주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+                printf("\n%s) ✨주식자산 기록이 완료되었습니다!\n", g_chatbot_name);
                 printf("\n(Enter를 눌러 계속...)\n");
                 clear_input_buffer();
                 getchar();
                 return;
             }
-            printf("\n%s) 매수할 종목의 평단가를 알려주세요!\n>>", g_chatbot_name);
+            printf("\n%s) 매수 가격은 얼마였나요?\n>>", g_chatbot_name);
             scanf("%lf", &price);
             break;
         case 1:
@@ -308,10 +308,10 @@ static void modify_stock() {
             }
             free_asset(asset_datas);
         //================================================
-            printf("\n%s) 매도할 종목의 이름을 알려주세요!\n>>", g_chatbot_name);
+            printf("\n%s) 매도하신 종목의 이름을 입력해주세요!\n>>", g_chatbot_name);
             scanf("%s", stock_name);
             if (db_checkStockName(stock_name) == false) {
-                printf("%s) %s 주식의 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
+                printf("%s) %s 주식 정보를 찾을 수 없습니다. 오타가 없는지 확인해주세요!\n",
                        g_chatbot_name, stock_name);
                 printf("\n(Enter를 눌러 계속...)\n");
                 clear_input_buffer();
@@ -319,13 +319,14 @@ static void modify_stock() {
                 return;
             }
             User_Stock *asset_data = db_getUserStock(g_user_data->user_id, stock_name);
-            printf("\n%s) 매도할 종목의 개수를 알려주세요! (현재 보유수: %d개)\n>>",
+            printf("\n%s) %s를 몇 주 매도하셨나요? (현재 보유수: %d개)\n>>",
                    g_chatbot_name,
+                     stock_name,
                    asset_data == NULL ? 0 : asset_data->quantity);
             scanf("%d", &quantity);
             if (quantity == 0) {
                 free(asset_data);
-                printf("\n%s) ✨주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+                printf("\n%s) ✨주식자산 기록이 완료되었습니다!\n", g_chatbot_name);
                 printf("\n(Enter를 눌러 계속...)\n");
                 clear_input_buffer();
                 getchar();
@@ -333,7 +334,7 @@ static void modify_stock() {
             }
             if (asset_data == NULL || asset_data->quantity < quantity) {
                 printf("\n%s) 매도할 보유주식이 적어요!\n", g_chatbot_name);
-                printf("%s) 현재 %s 보유주식: %d개\n",
+                printf("%s) 현재 %s 보유주식: %d주\n",
                        g_chatbot_name,
                        stock_name,
                        asset_data == NULL ? 0 : asset_data->quantity);
@@ -362,7 +363,7 @@ static void modify_stock() {
         free_asset(asset_data);
         db_updateAsset(stock_id, price * quantity);
         db_updateUserStock(g_user_data->user_id, stock_name, quantity, quantity * price);
-        printf("\n%s) ✨주식자산 조정이 완료되었습니다!\n", g_chatbot_name);
+        printf("\n%s) ✨주식자산 기록이 완료되었습니다!\n", g_chatbot_name);
         printf("\n(Enter를 눌러 계속...)\n");
         getchar();
     }
