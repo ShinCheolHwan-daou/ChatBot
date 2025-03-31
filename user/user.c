@@ -17,56 +17,56 @@ User *g_user_data = NULL;
 
 void user_print_ascii_art() {
     int text_colors[] = {
-        BLUE,
-        GREEN,
-        AQUA,
-        RED,
-        PURPLE,
-        YELLOW,
-        WHITE
+        WHITE,
+        LIGHT_BLUE,
+        LIGHT_BLUE,
+        LIGHT_BLUE,
+        LIGHT_BLUE,
+        LIGHT_YELLOW,
+        LIGHT_YELLOW
     };
-    colorPrintf(text_colors[0], BLACK, "██╗  ██╗ ");
-    colorPrintf(text_colors[1], BLACK, "██╗ ");
-    colorPrintf(text_colors[2], BLACK, "██╗    ██╗ ");
-    colorPrintf(text_colors[3], BLACK, " ██████╗  ");
-    colorPrintf(text_colors[4], BLACK, " ██████╗  ");
-    colorPrintf(text_colors[5], BLACK, "███╗   ███╗ ");
-    colorPrintf(text_colors[6], BLACK, "███████╗\n");
-    colorPrintf(text_colors[0], BLACK, "██║ ██╔╝ ");
-    colorPrintf(text_colors[1], BLACK, "██║ ");
-    colorPrintf(text_colors[2], BLACK, "██║    ██║ ");
-    colorPrintf(text_colors[3], BLACK, "██╔═══██╗ ");
-    colorPrintf(text_colors[4], BLACK, "██╔═══██╗ ");
-    colorPrintf(text_colors[5], BLACK, "████╗ ████║ ");
-    colorPrintf(text_colors[6], BLACK, "██╔════╝\n");
-    colorPrintf(text_colors[0], BLACK, "█████╔╝  ");
-    colorPrintf(text_colors[1], BLACK, "██║ ");
-    colorPrintf(text_colors[2], BLACK, "██║ █╗ ██║ ");
-    colorPrintf(text_colors[3], BLACK, "██║   ██║ ");
-    colorPrintf(text_colors[4], BLACK, "██║   ██║ ");
-    colorPrintf(text_colors[5], BLACK, "██╔████╔██║ ");
-    colorPrintf(text_colors[6], BLACK, "█████╗  \n");
-    colorPrintf(text_colors[0], BLACK, "██╔═██╗  ");
-    colorPrintf(text_colors[1], BLACK, "██║ ");
-    colorPrintf(text_colors[2], BLACK, "██║███╗██║ ");
-    colorPrintf(text_colors[3], BLACK, "██║   ██║ ");
-    colorPrintf(text_colors[4], BLACK, "██║   ██║ ");
-    colorPrintf(text_colors[5], BLACK, "██║╚██╔╝██║ ");
-    colorPrintf(text_colors[6], BLACK, "██╔══╝  \n");
-    colorPrintf(text_colors[0], BLACK, "██║  ██╗ ");
-    colorPrintf(text_colors[1], BLACK, "██║ ");
-    colorPrintf(text_colors[2], BLACK, "╚███╔███╔╝ ");
-    colorPrintf(text_colors[3], BLACK, "╚██████╔╝ ");
-    colorPrintf(text_colors[4], BLACK, "╚██████╔╝ ");
-    colorPrintf(text_colors[5], BLACK, "██║ ╚═╝ ██║ ");
-    colorPrintf(text_colors[6], BLACK, "███████╗\n");
-    colorPrintf(text_colors[0], BLACK, "╚═╝  ╚═╝ ");
-    colorPrintf(text_colors[1], BLACK, "╚═╝ ");
-    colorPrintf(text_colors[2], BLACK, " ╚══╝╚══╝  ");
-    colorPrintf(text_colors[3], BLACK, " ╚═════╝  ");
-    colorPrintf(text_colors[4], BLACK, " ╚═════╝  ");
-    colorPrintf(text_colors[5], BLACK, "╚═╝     ╚═╝ ");
-    colorPrintf(text_colors[6], BLACK, "╚══════╝\n");
+    colorPrintf(text_colors[0], BLACK, "██╗"); colorPrintf(LIGHT_PURPLE,BLACK, "  ██╗ ");colorPrintf(text_colors[1], BLACK, "██╗ ");colorPrintf(text_colors[2], BLACK, "██╗    ██╗ ");colorPrintf(text_colors[3], BLACK, " ██████╗  ");colorPrintf(text_colors[4], BLACK, " ██████╗  ");colorPrintf(text_colors[5], BLACK, "███╗   ███╗ ");colorPrintf(text_colors[6], BLACK, "███████╗\n");
+    colorPrintf(text_colors[0], BLACK, "██║"); colorPrintf(LIGHT_PURPLE,BLACK, " ██╔╝ ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "██║    ██║ ");colorPrintf(text_colors[3], BLACK, "██╔═══██╗ ");colorPrintf(text_colors[4], BLACK, "██╔═══██╗ ");colorPrintf(text_colors[5], BLACK, "████╗ ████║ ");colorPrintf(text_colors[6], BLACK, "██╔════╝\n");
+    colorPrintf(text_colors[0], BLACK, "███"); colorPrintf(LIGHT_PURPLE,BLACK, "██╔╝  ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "██║ █╗ ██║ ");colorPrintf(text_colors[3], BLACK, "██║   ██║ ");colorPrintf(text_colors[4], BLACK, "██║   ██║ ");colorPrintf(text_colors[5], BLACK, "██╔████╔██║ ");colorPrintf(text_colors[6], BLACK, "█████╗  \n");
+    colorPrintf(text_colors[0], BLACK, "██╔═██╗  ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "██║███╗██║ ");colorPrintf(text_colors[3], BLACK, "██║   ██║ ");colorPrintf(text_colors[4], BLACK, "██║   ██║ ");colorPrintf(text_colors[5], BLACK, "██║╚██╔╝██║ ");colorPrintf(text_colors[6], BLACK, "██╔══╝  \n");
+    colorPrintf(text_colors[0], BLACK, "██║  ██╗ ");colorPrintf(text_colors[1], BLACK, "██║ ");colorPrintf(text_colors[2], BLACK, "╚███╔███╔╝ ");colorPrintf(text_colors[3], BLACK, "╚██████╔╝ ");colorPrintf(text_colors[4], BLACK, "╚██████╔╝ ");colorPrintf(text_colors[5], BLACK, "██║ ╚═╝ ██║ ");colorPrintf(text_colors[6], BLACK, "███████╗\n");
+    colorPrintf(text_colors[0], BLACK, "╚═╝  ╚═╝ ");colorPrintf(text_colors[1], BLACK, "╚═╝ ");colorPrintf(text_colors[2], BLACK, " ╚══╝╚══╝  ");colorPrintf(text_colors[3], BLACK, " ╚═════╝  ");colorPrintf(text_colors[4], BLACK, " ╚═════╝  ");colorPrintf(text_colors[5], BLACK, "╚═╝     ╚═╝ ");colorPrintf(text_colors[6], BLACK, "╚══════╝\n");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 int user_login_page() {
