@@ -225,7 +225,7 @@ static void modify_stock() {
                 g_chatbot_name,
                 asset_data == NULL ? 0 : asset_data->quantity);
             scanf("%d", &quantity);
-            if (asset_data == NULL || asset_data[IDX_STOCK].quantity < quantity) {
+            if (asset_data == NULL || asset_data->quantity < quantity) {
                 printf("%s) 매도할 보유주식이 적어요!\n", g_chatbot_name);
                 printf("%s) 현재 %s 보유주식: %d개\n",
                        g_chatbot_name,
