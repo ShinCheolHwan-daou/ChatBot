@@ -31,13 +31,14 @@ int get_display_width(const char *str) {
 }
 
 // 너비에 맞춰 오른쪽 공백 추가
-void print_aligned_str(const char *str, int desired_width) {
-    int current_width = get_display_width(str);
-    printf("%s", str);
-    for (int i = current_width; i < desired_width; i++) {
-        printf(" ");
+void print_aligned_str(FILE *f, const char *s, int target_width) {
+    int current_width = get_display_width(s);
+    fprintf(f, "%s", s);
+    for (int j = current_width; j < target_width; j++) {
+        fprintf(f, " ");
     }
 }
+
 
 
 void asset_print_asset() {
@@ -65,7 +66,7 @@ void asset_print_asset() {
                 double avg_price = stock_data[i].total_price / stock_data[i].quantity;
 
                 printf("| ");
-                print_aligned_str(stock_data[i].stock_name, 16); // 맞춤 폭 (16칸)
+                print_aligned_str(stdout, stock_data[i].stock_name, 16); // 맞춤 폭 (16칸)
                 printf("| %6d | %12.2f원 | %14.2f원 |\n",
                        stock_data[i].quantity,
                        avg_price,
@@ -161,30 +162,23 @@ static void save_text(Asset *asset) {
     if (stock_data != NULL) {
         int total_stocks = asset_data[IDX_STOCK].data.stock.stock_count;
 
-        fprintf(f, "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        fprintf(f, "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
         fprintf(f, "📑 보유 종목 정보 (총 %d건)\n", total_stocks);
-        fprintf(f, "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-        fprintf(f, "|     종목명      | 보유량 |     평단가     |       총액       |\n");
-        fprintf(f, "|-----------------|--------|----------------|------------------|\n");
+        fprintf(f, "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        fprintf(f, "     종목명       보유량      평단가            총액       \n");
+        fprintf(f, "-----------------------------------------------------------------\n");
 
         for (int i = 0; i < total_stocks; i++) {
             if (stock_data[i].quantity > 0) {
                 double avg_price = stock_data[i].total_price / stock_data[i].quantity;
-
-                fprintf(f, "| ");
-                // print_aligned_str(stock_data[i].stock_name, 16); // 맞춤 폭 (16칸)
-                int current_width = get_display_width(stock_data[i].stock_name);
-                fprintf(f, "%s", stock_data[i].stock_name);
-                for (int i = current_width; i < 16; i++) {
-                    fprintf(f, " ");
-                }
-                fprintf(f, "| %6d | %12.2f원 | %14.2f원 |\n",
-                       stock_data[i].quantity,
-                       avg_price,
-                       stock_data[i].total_price);
+                print_aligned_str(f, stock_data[i].stock_name, 16);
+                fprintf(f, " %6d  %12.2f원  %14.2f원 \n",
+                        stock_data[i].quantity,
+                        avg_price,
+                        stock_data[i].total_price);
             }
         }
-        fprintf(f, "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        fprintf(f, "━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
 
         fclose(f);
         printf("\n%s) 💾text 파일 저장을 완료했습니다!\n", g_chatbot_name);
@@ -330,7 +324,7 @@ static void modify_stock() {
                         double avg_price = stock_data[i].total_price / stock_data[i].quantity;
 
                         printf("| ");
-                        print_aligned_str(stock_data[i].stock_name, 16); // 맞춤 폭 (16칸)
+                        print_aligned_str(stdout, stock_data[i].stock_name, 16); // 맞춤 폭 (16칸)
                         printf("| %6d | %12.2f원 | %14.2f원 |\n",
                                stock_data[i].quantity,
                                avg_price,
