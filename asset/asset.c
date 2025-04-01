@@ -6,6 +6,8 @@
 #include "../db/db.h"
 #include "../print/print.h"
 
+
+
 const char *asset_type_strings[] = {
     "현금자산",
     "주식자산"
@@ -146,28 +148,47 @@ static void save_binary(Asset *asset) {
 
 static void save_text(Asset *asset) {
     FILE *f = fopen("assets.txt", "w");
-    fprintf(f, "<<%s님의 자산 현황>>\n", g_user_data->name);
-    for (int i = 0; i < TOTAL_ASSET_NUM; i++) {
-        fprintf(f, "[%s] 총 %.2f원\n",
-                asset_type_strings[i],
-                asset[i].amount
-        );
-    }
 
-    User_Stock *stock_data = asset[IDX_STOCK].data.stock.user_stock;
+    Asset *asset_data = db_getUserAsset(g_user_data->user_id);
+    fprintf(f, "<<%s님의 자산 현황>>\n\n", g_user_data->name);
+    fprintf(f, "[💵 현금자산] 총 %.2f원\n", asset_data[IDX_CASH].amount);
+    fprintf(f, "[📈 주식자산] 총 %.2f원\n", asset_data[IDX_STOCK].amount);
+    fprintf(f, "------------------------------\n");
+    fprintf(f, "[📊 총 자산] 총 %.2f원\n", asset_data[IDX_CASH].amount + asset_data[IDX_STOCK].amount);
+
+    User_Stock *stock_data = asset_data[IDX_STOCK].data.stock.user_stock;
+
     if (stock_data != NULL) {
-        for (int i = 0; i < asset[IDX_STOCK].data.stock.stock_count; i++) {
+        int total_stocks = asset_data[IDX_STOCK].data.stock.stock_count;
+
+        fprintf(f, "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        fprintf(f, "📑 보유 종목 정보 (총 %d건)\n", total_stocks);
+        fprintf(f, "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        fprintf(f, "|     종목명      | 보유량 |     평단가     |       총액       |\n");
+        fprintf(f, "|-----------------|--------|----------------|------------------|\n");
+
+        for (int i = 0; i < total_stocks; i++) {
             if (stock_data[i].quantity > 0) {
-                fprintf(f, "- 종목명: %s, 보유량: %d, 평단가: %.2f, 총액: %.2f\n",
-                        stock_data[i].stock_name,
-                        stock_data[i].quantity,
-                        stock_data[i].current_price / stock_data[i].quantity,
-                        stock_data[i].total_price);
+                double avg_price = stock_data[i].total_price / stock_data[i].quantity;
+
+                fprintf(f, "| ");
+                // print_aligned_str(stock_data[i].stock_name, 16); // 맞춤 폭 (16칸)
+                int current_width = get_display_width(stock_data[i].stock_name);
+                fprintf(f, "%s", stock_data[i].stock_name);
+                for (int i = current_width; i < 16; i++) {
+                    fprintf(f, " ");
+                }
+                fprintf(f, "| %6d | %12.2f원 | %14.2f원 |\n",
+                       stock_data[i].quantity,
+                       avg_price,
+                       stock_data[i].total_price);
             }
         }
+        fprintf(f, "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+
+        fclose(f);
+        printf("\n%s) 💾text 파일 저장을 완료했습니다!\n", g_chatbot_name);
     }
-    fclose(f);
-    printf("\n%s) 💾text 파일 저장을 완료했습니다!\n", g_chatbot_name);
 }
 
 void asset_modify_asset_amount() {
